@@ -5,17 +5,17 @@ mqtt:
 go2rtc:
   streams:
     doorbell_main:
-      - "reolink://{REOLINK_DOORBELL_USER}:{REOLINK_DOORBELL_PASS}@{REOLINK_DOORBELL_UID}?channel=0&stream=main"
+      - "reolink://{FRIGATE_DOORBELL_USER}:{FRIGATE_DOORBELL_PASS}@{FRIGATE_DOORBELL_UID}?channel=0&stream=main"
     doorbell_sub:
-      - "reolink://{REOLINK_DOORBELL_USER}:{REOLINK_DOORBELL_PASS}@{REOLINK_DOORBELL_UID}?channel=0&stream=ext"
+      - "reolink://{FRIGATE_DOORBELL_USER}:{FRIGATE_DOORBELL_PASS}@{FRIGATE_DOORBELL_UID}?channel=0&stream=ext"
     garage_main:
-      - "reolink://{REOLINK_GARAGE_USER}:{REOLINK_GARAGE_PASS}@192.168.1.11:9000?channel=0&stream=main"
+      - "reolink://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_PASS}@192.168.1.11:9000?channel=0&stream=main"
     garage_sub:
-      - "reolink://{REOLINK_GARAGE_USER}:{REOLINK_GARAGE_PASS}@192.168.1.11:9000?channel=0&stream=sub"
+      - "reolink://{FRIGATE_GARAGE_USER}:{FRIGATE_GARAGE_PASS}@192.168.1.11:9000?channel=0&stream=sub"
     living_room_main:
-      - "reolink://{REOLINK_LIVING_ROOM_USER}:{REOLINK_LIVING_ROOM_PASS}@192.168.1.12:9000?channel=0&stream=main"
+      - "reolink://{FRIGATE_LIVING_ROOM_USER}:{FRIGATE_LIVING_ROOM_PASS}@192.168.1.12:9000?channel=0&stream=main"
     living_room_sub:
-      - "reolink://{REOLINK_LIVING_ROOM_USER}:{REOLINK_LIVING_ROOM_PASS}@192.168.1.12:9000?channel=0&stream=sub"
+      - "reolink://{FRIGATE_LIVING_ROOM_USER}:{FRIGATE_LIVING_ROOM_PASS}@192.168.1.12:9000?channel=0&stream=sub"
 
 ffmpeg:
   hwaccel_args: preset-vaapi
@@ -70,7 +70,6 @@ cameras:
         - person
         - cat
         - dog
-        - package
 
   garage:
     ffmpeg:
