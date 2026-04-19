@@ -1,6 +1,6 @@
 # homelab-stack
 
-Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running on a Beelink i12 with Ubuntu Server.
+Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running on a Beelink S12 with Ubuntu Server.
 
 ## Services
 
