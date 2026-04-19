@@ -95,7 +95,8 @@ homelab-stack/
 ├── motd/
 │   └── blackbox-motd.sh    # SSH login banner
 ├── frigate/
-│   └── config.yml          # Frigate NVR + go2rtc configuration
+│   └── config/
+│       └── config.yml      # Frigate NVR + go2rtc configuration
 ├── mosquitto/
 │   └── config/
 │       └── mosquitto.conf  # MQTT broker configuration

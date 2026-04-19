@@ -1,0 +1,5 @@
+# Ignore all Frigate runtime data (DB, model cache, clips, etc.)
+*
+# Track the config file and this gitignore
+!.gitignore
+!config.yml
