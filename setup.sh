@@ -68,6 +68,10 @@ mkdir -p "${REPO_DIR}/plex/config"
 mkdir -p "${REPO_DIR}/homeassistant/config"
 mkdir -p "${REPO_DIR}/pihole/etc-pihole"
 mkdir -p "${REPO_DIR}/pihole/etc-dnsmasq.d"
+mkdir -p "${REPO_DIR}/frigate/config"
+mkdir -p "${REPO_DIR}/mosquitto/config"
+mkdir -p "${REPO_DIR}/mosquitto/data"
+mkdir -p "${REPO_DIR}/mosquitto/log"
 
 echo "  Done."
 

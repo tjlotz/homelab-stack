@@ -6,6 +6,8 @@ plex/config/
 homeassistant/config/
 pihole/etc-pihole/
 pihole/etc-dnsmasq.d/
+mosquitto/data/
+mosquitto/log/
 
 # OS
 .DS_Store

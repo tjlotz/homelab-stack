@@ -9,6 +9,8 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 | **Plex** | `32400` (host network) | Media server streaming from NAS |
 | **Home Assistant** | `8123` (host network) | Home automation platform |
 | **Pi-hole** | `53` (DNS), `8080` (web UI) | Network-wide ad blocking |
+| **Frigate** | `5000` (web UI), `8971` (API) | Local NVR with object detection (Intel Quick Sync) |
+| **Mosquitto** | `1883` | MQTT broker for Frigate/HA communication |
 
 ## Hardware
 
@@ -24,7 +26,7 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 | Range | Device Type | Current Assignments |
 |-------|-------------|---------------------|
 | `.2-.9` | Infrastructure | `.2` BLACKBOX, `.3` WD MyCloud NAS |
-| `.10-.49` | Cameras | |
+| `.10-.49` | Cameras | `.10` Doorbell (D340B), `.11` Garage (E1 Zoom), `.12` Living Room (E1 Zoom) |
 | `.50-.99` | Lights | |
 | `.100-.149` | Switches/Plugs | |
 | `.150-.199` | Air Purifiers | |
@@ -39,6 +41,11 @@ homelab-stack/
 ├── setup.sh                # One-time server bootstrap script
 ├── motd/
 │   └── blackbox-motd.sh    # SSH login banner
+├── frigate/
+│   └── config.yml          # Frigate NVR configuration
+├── mosquitto/
+│   └── config/
+│       └── mosquitto.conf  # MQTT broker configuration
 ├── plex/config/            # Plex persistent data (gitignored)
 ├── homeassistant/config/   # Home Assistant persistent data (gitignored)
 └── pihole/
@@ -88,6 +95,7 @@ homelab-stack/
 | Plex | `http://192.168.1.2:32400/web` |
 | Home Assistant | `http://192.168.1.2:8123` |
 | Pi-hole | `http://192.168.1.2:8080/admin` |
+| Frigate | `http://192.168.1.2:5000` |
 
 ## License
 

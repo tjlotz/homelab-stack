@@ -41,3 +41,36 @@ services:
     cap_add:
       - NET_ADMIN
     restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    restart: unless-stopped
+
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:stable
+    container_name: frigate
+    privileged: true
+    shm_size: "256mb"
+    ports:
+      - "5000:5000"
+      - "8971:8971"
+    environment:
+      - FRIGATE_DOORBELL_PASS=${FRIGATE_DOORBELL_PASS}
+      - FRIGATE_GARAGE_PASS=${FRIGATE_GARAGE_PASS}
+      - FRIGATE_LIVING_ROOM_PASS=${FRIGATE_LIVING_ROOM_PASS}
+    volumes:
+      - ./frigate/config:/config
+      - /mnt/Cameras:/media/frigate
+      - /etc/localtime:/etc/localtime:ro
+    devices:
+      - /dev/dri:/dev/dri
+    depends_on:
+      - mosquitto
+    restart: unless-stopped

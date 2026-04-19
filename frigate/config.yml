@@ -1,0 +1,68 @@
+mqtt:
+  host: mosquitto
+  port: 1883
+
+ffmpeg:
+  hwaccel_args: preset-vaapi
+
+detect:
+  width: 1280
+  height: 720
+  fps: 5
+
+objects:
+  track:
+    - person
+    - cat
+    - dog
+
+record:
+  enabled: true
+  retain:
+    days: 14
+    mode: all
+  events:
+    retain:
+      default: 14
+
+snapshots:
+  enabled: true
+  retain:
+    default: 14
+
+cameras:
+  doorbell:
+    ffmpeg:
+      inputs:
+        - path: rtsp://admin:{FRIGATE_DOORBELL_PASS}@192.168.1.10:554/h264Preview_01_main
+          roles:
+            - record
+        - path: rtsp://admin:{FRIGATE_DOORBELL_PASS}@192.168.1.10:554/h264Preview_01_sub
+          roles:
+            - detect
+    objects:
+      track:
+        - person
+        - cat
+        - dog
+        - package
+
+  garage:
+    ffmpeg:
+      inputs:
+        - path: rtsp://admin:{FRIGATE_GARAGE_PASS}@192.168.1.11:554/h264Preview_01_main
+          roles:
+            - record
+        - path: rtsp://admin:{FRIGATE_GARAGE_PASS}@192.168.1.11:554/h264Preview_01_sub
+          roles:
+            - detect
+
+  living_room:
+    ffmpeg:
+      inputs:
+        - path: rtsp://admin:{FRIGATE_LIVING_ROOM_PASS}@192.168.1.12:554/h264Preview_01_main
+          roles:
+            - record
+        - path: rtsp://admin:{FRIGATE_LIVING_ROOM_PASS}@192.168.1.12:554/h264Preview_01_sub
+          roles:
+            - detect
