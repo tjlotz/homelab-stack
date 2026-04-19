@@ -1,0 +1,12 @@
+# Environment variables (contains secrets)
+.env
+
+# Persistent service data (created by setup.sh, managed by Docker)
+plex/config/
+homeassistant/config/
+pihole/etc-pihole/
+pihole/etc-dnsmasq.d/
+
+# OS
+.DS_Store
+Thumbs.db
