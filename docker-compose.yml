@@ -55,26 +55,6 @@ services:
       - ./mosquitto/log:/mosquitto/log
     restart: unless-stopped
 
-  go2rtc:
-    image: alexxit/go2rtc:latest
-    container_name: go2rtc
-    ports:
-      - "1984:1984"
-      - "8554:8554"
-      - "8555:8555/tcp"
-      - "8555:8555/udp"
-    environment:
-      - REOLINK_DOORBELL_USER=${REOLINK_DOORBELL_USER}
-      - REOLINK_DOORBELL_PASS=${REOLINK_DOORBELL_PASS}
-      - REOLINK_DOORBELL_UID=${REOLINK_DOORBELL_UID}
-      - REOLINK_GARAGE_USER=${REOLINK_GARAGE_USER}
-      - REOLINK_GARAGE_PASS=${REOLINK_GARAGE_PASS}
-      - REOLINK_LIVING_ROOM_USER=${REOLINK_LIVING_ROOM_USER}
-      - REOLINK_LIVING_ROOM_PASS=${REOLINK_LIVING_ROOM_PASS}
-    volumes:
-      - ./go2rtc/config:/config
-    restart: unless-stopped
-
   frigate:
     image: ghcr.io/blakeblackshear/frigate:stable
     container_name: frigate
@@ -93,5 +73,4 @@ services:
       - /dev/dri:/dev/dri
     depends_on:
       - mosquitto
-      - go2rtc
     restart: unless-stopped

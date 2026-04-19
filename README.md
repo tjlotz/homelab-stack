@@ -10,7 +10,6 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 | **Home Assistant** | `8123` (host network) | Home automation platform |
 | **Pi-hole** | `53` (DNS), `8080` (web UI) | Network-wide ad blocking |
 | **Frigate** | `5000` (web UI), `8971` (API) | Local NVR with event-based object detection (OpenVINO + Intel Quick Sync) |
-| **go2rtc** | `1984` (web UI), `8554` (RTSP), `8555` (WebRTC) | Stream proxy — connects to Reolink cameras via Baichuan protocol |
 | **Mosquitto** | `1883` | MQTT broker for Frigate/HA communication |
 
 ## Hardware
@@ -27,28 +26,28 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 ### Architecture
 
 ```
-Reolink Cameras
-  ├── E1 Zoom (.11, .12) ─► go2rtc (reolink:// port 9000) ─┐
-  └── Doorbell (.10) ─────► go2rtc (reolink:// P2P via UID) ─┤
-                                                               ▼
-                                                     RTSP restream (:8554)
-                                                         │         │
-                                                     Frigate      HA
-                                                   (detection)  (live view)
-                                                         │
-  Object detection: person, animal on all cameras        │
-  Hardware decode:  Intel Quick Sync (vaapi, N100 iGPU)  │
-  AI detector:      OpenVINO (CPU)                       │
-  Recording:        /mnt/Cameras — events only, 14-day   │
-                                                         │
-  Home Assistant ◄── Frigate integration (MQTT) ─────────┘
+Reolink E1 Zoom Cameras (.11, .12)
+  └── HA Reolink Integration (Baichuan protocol, port 9000)
+        └── HA built-in go2rtc (RTSP restream :8554)
+              ├── Frigate (object detection + event recording)
+              └── HA dashboard (live view)
+
+  Object detection: person, cat, dog
+  Hardware decode:  Intel Quick Sync (vaapi, N100 iGPU)
+  AI detector:      OpenVINO (CPU)
+  Recording:        /mnt/Cameras — events only, 14-day retention
+
+  Home Assistant ◄── Frigate integration (MQTT) ── Frigate
+
+Reolink Doorbell D340B (.10)
+  └── Reolink app only (no local API — see Issue #6)
 ```
 
-- **go2rtc** (standalone container) connects to all cameras via Reolink's Baichuan protocol — no RTSP/ONVIF ports needed
-- **E1 Zoom cameras** connect directly via `reolink://IP:9000` (port 9000 must be enabled in Reolink app under "Basic Services Port")
-- **Doorbell** connects via P2P using UID (`reolink://UID`) — initial handshake goes through Reolink's servers, video stays local
-- **Frigate** consumes RTSP restreams from go2rtc for object detection and event recording
-- **Home Assistant** provides the unified dashboard via Frigate integration (MQTT) and can also consume go2rtc streams directly
+- **Home Assistant** is the central hub — Reolink integration connects to E1 Zoom cameras via Baichuan protocol on port 9000
+- **HA's built-in go2rtc** restreams camera feeds as RTSP, consumed by both Frigate and HA's dashboard
+- **Frigate** handles object detection and event-only recording to NAS
+- **Doorbell** is not integrated — battery-powered D340B has no local API. Requires a Reolink Home Hub for HA integration (see [Issue #6](https://github.com/tjlotz/homelab-stack/issues/6))
+- **E1 Zoom cameras** require "Basic Services Port" set to `9000` in the Reolink app
 
 ### Recording
 
@@ -63,10 +62,11 @@ Reolink Cameras
 
 These integrations are configured via the HA web UI at `http://192.168.1.2:8123`:
 
-1. **Reolink integration** — add each camera by IP (E1 Zooms) or by UID (doorbell):
+1. **Reolink integration** — add each E1 Zoom camera by IP:
    - Settings → Devices & Services → Add Integration → Reolink
-   - Enter camera IP/UID, username, and password
-   - Repeat for all three cameras
+   - Enter camera IP, username, and password
+   - The integration connects via Baichuan protocol on port 9000
+   - Note: the doorbell (D340B) cannot be added — see [Issue #6](https://github.com/tjlotz/homelab-stack/issues/6)
 
 2. **Frigate integration** (via HACS):
    - Install HACS in HA if not already installed
@@ -83,7 +83,7 @@ These integrations are configured via the HA web UI at `http://192.168.1.2:8123`
 | Range | Device Type | Current Assignments |
 |-------|-------------|---------------------|
 | `.2-.9` | Infrastructure | `.2` BLACKBOX, `.3` WD MyCloud NAS |
-| `.10-.49` | Cameras | `.10` Doorbell (D340B), `.11` Garage (E1 Zoom), `.12` Living Room (E1 Zoom) |
+| `.10-.49` | Cameras | `.10` Doorbell (D340B, Reolink app only), `.11` Garage (E1 Zoom), `.12` Living Room (E1 Zoom) |
 | `.50-.99` | Lights | |
 | `.100-.149` | Switches/Plugs | |
 | `.150-.199` | Air Purifiers | |
@@ -100,10 +100,7 @@ homelab-stack/
 │   └── blackbox-motd.sh    # SSH login banner
 ├── frigate/
 │   └── config/
-│       └── config.yml      # Frigate NVR + go2rtc configuration
-├── go2rtc/
-│   └── config/
-│       └── go2rtc.yaml     # go2rtc stream proxy configuration
+│       └── config.yml      # Frigate NVR configuration
 ├── mosquitto/
 │   └── config/
 │       └── mosquitto.conf  # MQTT broker configuration
@@ -135,7 +132,7 @@ homelab-stack/
    cp .env.example .env
    nano .env
    ```
-   Fill in your timezone, Plex claim token (get one at https://www.plex.tv/claim), Pi-hole password, NAS credentials, and Reolink camera credentials (username, password, and doorbell UID).
+   Fill in your timezone, Plex claim token (get one at https://www.plex.tv/claim), Pi-hole password, and NAS credentials. Camera credentials are configured via the HA web UI (see Home Assistant Setup above).
 
 3. Run the setup script:
    ```bash
@@ -157,7 +154,6 @@ homelab-stack/
 | Home Assistant | `http://192.168.1.2:8123` |
 | Pi-hole | `http://192.168.1.2:8080/admin` |
 | Frigate | `http://192.168.1.2:5000` |
-| go2rtc | `http://192.168.1.2:1984` |
 
 ## License
 

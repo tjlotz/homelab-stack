@@ -1,5 +1,5 @@
 mqtt:
-  host: mosquitto
+  host: 192.168.1.2
   port: 1883
 
 ffmpeg:
@@ -39,26 +39,14 @@ snapshots:
     default: 14
 
 cameras:
-  doorbell:
-    ffmpeg:
-      inputs:
-        - path: rtsp://go2rtc:8554/doorbell_main
-          input_args: preset-rtsp-restream
-          roles:
-            - record
-        - path: rtsp://go2rtc:8554/doorbell_sub
-          input_args: preset-rtsp-restream
-          roles:
-            - detect
-
   garage:
     ffmpeg:
       inputs:
-        - path: rtsp://go2rtc:8554/garage_main
+        - path: rtsp://192.168.1.2:8554/01KPKSRWT1AMB9R6R0HJB05SZ1_main
           input_args: preset-rtsp-restream
           roles:
             - record
-        - path: rtsp://go2rtc:8554/garage_sub
+        - path: rtsp://192.168.1.2:8554/01KPKSRWT1AMB9R6R0HJB05SZ1_sub
           input_args: preset-rtsp-restream
           roles:
             - detect
@@ -66,11 +54,11 @@ cameras:
   living_room:
     ffmpeg:
       inputs:
-        - path: rtsp://go2rtc:8554/living_room_main
+        - path: rtsp://192.168.1.2:8554/01KPKST9VTEMJ2A682S7ZAV9DV_main
           input_args: preset-rtsp-restream
           roles:
             - record
-        - path: rtsp://go2rtc:8554/living_room_sub
+        - path: rtsp://192.168.1.2:8554/01KPKST9VTEMJ2A682S7ZAV9DV_sub
           input_args: preset-rtsp-restream
           roles:
             - detect

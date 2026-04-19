@@ -1,5 +1,0 @@
-# Ignore all go2rtc runtime data
-*
-# Track the config file and this gitignore
-!.gitignore
-!go2rtc.yaml
