@@ -12,7 +12,7 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 
 ## Hardware
 
-- **Server:** Beelink i12 (Ubuntu Server 24.04, headless)
+- **Server:** [Beelink S12](https://amazon.com/dp/B0BVFS94J5) (Ubuntu Server 24.04, headless)
 - **Storage:** WD MyCloud NAS at `192.168.1.100`
   - `Public` share mounted at `/mnt/media` (movies, TV, music)
   - `Cameras` share mounted at `/mnt/cameras` (security footage)
