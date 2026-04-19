@@ -9,7 +9,8 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 | **Plex** | `32400` (host network) | Media server streaming from NAS |
 | **Home Assistant** | `8123` (host network) | Home automation platform |
 | **Pi-hole** | `53` (DNS), `8080` (web UI) | Network-wide ad blocking |
-| **Frigate** | `5000` (web UI), `8554` (RTSP restream), `8555` (WebRTC), `8971` (API) | Local NVR with object detection (OpenVINO + Intel Quick Sync) |
+| **Frigate** | `5000` (web UI), `8971` (API) | Local NVR with event-based object detection (OpenVINO + Intel Quick Sync) |
+| **go2rtc** | `1984` (web UI), `8554` (RTSP), `8555` (WebRTC) | Stream proxy — connects to Reolink cameras via Baichuan protocol |
 | **Mosquitto** | `1883` | MQTT broker for Frigate/HA communication |
 
 ## Hardware
@@ -27,32 +28,35 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 
 ```
 Reolink Cameras
-  ├── E1 Zoom (.11, .12) ─► go2rtc (reolink:// port 9000) ─► Frigate
-  └── Doorbell (.10) ─────► go2rtc (reolink:// P2P via UID) ─► Frigate
-                                                                   │
-  Object detection: person, animal on all; package on doorbell     │
-  Hardware decode:  Intel Quick Sync (vaapi, N100 iGPU)            │
-  AI detector:      OpenVINO (CPU)                                 │
-  Recording:        /mnt/Cameras — 14-day retention                │
-                                                                   │
-  Home Assistant ◄── Frigate integration (MQTT) ───────────────────┘
-       │
-       └── Reolink integration (live view, controls, doorbell events)
+  ├── E1 Zoom (.11, .12) ─► go2rtc (reolink:// port 9000) ─┐
+  └── Doorbell (.10) ─────► go2rtc (reolink:// P2P via UID) ─┤
+                                                               ▼
+                                                     RTSP restream (:8554)
+                                                         │         │
+                                                     Frigate      HA
+                                                   (detection)  (live view)
+                                                         │
+  Object detection: person, animal on all cameras        │
+  Hardware decode:  Intel Quick Sync (vaapi, N100 iGPU)  │
+  AI detector:      OpenVINO (CPU)                       │
+  Recording:        /mnt/Cameras — events only, 14-day   │
+                                                         │
+  Home Assistant ◄── Frigate integration (MQTT) ─────────┘
 ```
 
-- **go2rtc** (bundled with Frigate) connects to all cameras via Reolink's Baichuan protocol — no RTSP/ONVIF ports needed
+- **go2rtc** (standalone container) connects to all cameras via Reolink's Baichuan protocol — no RTSP/ONVIF ports needed
 - **E1 Zoom cameras** connect directly via `reolink://IP:9000` (port 9000 must be enabled in Reolink app under "Basic Services Port")
 - **Doorbell** connects via P2P using UID (`reolink://UID`) — initial handshake goes through Reolink's servers, video stays local
-- **Frigate** handles all object detection and recording locally
-- **Home Assistant** provides the unified dashboard via Frigate integration (MQTT) and Reolink integration (live view + controls)
+- **Frigate** consumes RTSP restreams from go2rtc for object detection and event recording
+- **Home Assistant** provides the unified dashboard via Frigate integration (MQTT) and can also consume go2rtc streams directly
 
 ### Recording
 
 | Setting | Value |
 |---------|-------|
-| Continuous recording | Low-res detect stream (motion segments) |
-| Event recording | High-res main stream (person, animal, package triggers) |
-| Retention | 14 days for all recordings and snapshots |
+| Continuous recording | Disabled |
+| Event recording | High-res main stream (person, animal triggers) |
+| Retention | 14 days for event recordings and snapshots |
 | Storage | NAS at `/mnt/Cameras` |
 
 ### Home Assistant Setup
@@ -97,6 +101,9 @@ homelab-stack/
 ├── frigate/
 │   └── config/
 │       └── config.yml      # Frigate NVR + go2rtc configuration
+├── go2rtc/
+│   └── config/
+│       └── go2rtc.yaml     # go2rtc stream proxy configuration
 ├── mosquitto/
 │   └── config/
 │       └── mosquitto.conf  # MQTT broker configuration
@@ -150,6 +157,7 @@ homelab-stack/
 | Home Assistant | `http://192.168.1.2:8123` |
 | Pi-hole | `http://192.168.1.2:8080/admin` |
 | Frigate | `http://192.168.1.2:5000` |
+| go2rtc | `http://192.168.1.2:1984` |
 
 ## License
 

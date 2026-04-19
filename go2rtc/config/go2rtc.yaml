@@ -1,0 +1,13 @@
+streams:
+  doorbell_main:
+    - "reolink://${REOLINK_DOORBELL_UID}?username=${REOLINK_DOORBELL_USER}&password=${REOLINK_DOORBELL_PASS}&channel=0&stream=main"
+  doorbell_sub:
+    - "reolink://${REOLINK_DOORBELL_UID}?username=${REOLINK_DOORBELL_USER}&password=${REOLINK_DOORBELL_PASS}&channel=0&stream=ext"
+  garage_main:
+    - "reolink://192.168.1.11:9000?username=${REOLINK_GARAGE_USER}&password=${REOLINK_GARAGE_PASS}&channel=0&stream=main"
+  garage_sub:
+    - "reolink://192.168.1.11:9000?username=${REOLINK_GARAGE_USER}&password=${REOLINK_GARAGE_PASS}&channel=0&stream=sub"
+  living_room_main:
+    - "reolink://192.168.1.12:9000?username=${REOLINK_LIVING_ROOM_USER}&password=${REOLINK_LIVING_ROOM_PASS}&channel=0&stream=main"
+  living_room_sub:
+    - "reolink://192.168.1.12:9000?username=${REOLINK_LIVING_ROOM_USER}&password=${REOLINK_LIVING_ROOM_PASS}&channel=0&stream=sub"
