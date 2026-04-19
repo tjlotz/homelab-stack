@@ -22,6 +22,8 @@ services:
       - TZ=${TZ}
     volumes:
       - ./homeassistant/config:/config
+    depends_on:
+      - mosquitto
     restart: unless-stopped
 
   pihole:
@@ -60,11 +62,19 @@ services:
     shm_size: "256mb"
     ports:
       - "5000:5000"
+      - "8554:8554"
+      - "8555:8555/tcp"
+      - "8555:8555/udp"
       - "8971:8971"
     environment:
-      - FRIGATE_DOORBELL_PASS=${FRIGATE_DOORBELL_PASS}
-      - FRIGATE_GARAGE_PASS=${FRIGATE_GARAGE_PASS}
-      - FRIGATE_LIVING_ROOM_PASS=${FRIGATE_LIVING_ROOM_PASS}
+      - FRIGATE_MQTT_PASSWORD=
+      - REOLINK_DOORBELL_USER=${REOLINK_DOORBELL_USER}
+      - REOLINK_DOORBELL_PASS=${REOLINK_DOORBELL_PASS}
+      - REOLINK_DOORBELL_UID=${REOLINK_DOORBELL_UID}
+      - REOLINK_GARAGE_USER=${REOLINK_GARAGE_USER}
+      - REOLINK_GARAGE_PASS=${REOLINK_GARAGE_PASS}
+      - REOLINK_LIVING_ROOM_USER=${REOLINK_LIVING_ROOM_USER}
+      - REOLINK_LIVING_ROOM_PASS=${REOLINK_LIVING_ROOM_PASS}
     volumes:
       - ./frigate/config:/config
       - /mnt/Cameras:/media/frigate

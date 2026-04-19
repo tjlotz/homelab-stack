@@ -2,12 +2,34 @@ mqtt:
   host: mosquitto
   port: 1883
 
+go2rtc:
+  streams:
+    doorbell_main:
+      - "reolink://{REOLINK_DOORBELL_USER}:{REOLINK_DOORBELL_PASS}@{REOLINK_DOORBELL_UID}?channel=0&stream=main"
+    doorbell_sub:
+      - "reolink://{REOLINK_DOORBELL_USER}:{REOLINK_DOORBELL_PASS}@{REOLINK_DOORBELL_UID}?channel=0&stream=ext"
+    garage_main:
+      - "reolink://{REOLINK_GARAGE_USER}:{REOLINK_GARAGE_PASS}@192.168.1.11:9000?channel=0&stream=main"
+    garage_sub:
+      - "reolink://{REOLINK_GARAGE_USER}:{REOLINK_GARAGE_PASS}@192.168.1.11:9000?channel=0&stream=sub"
+    living_room_main:
+      - "reolink://{REOLINK_LIVING_ROOM_USER}:{REOLINK_LIVING_ROOM_PASS}@192.168.1.12:9000?channel=0&stream=main"
+    living_room_sub:
+      - "reolink://{REOLINK_LIVING_ROOM_USER}:{REOLINK_LIVING_ROOM_PASS}@192.168.1.12:9000?channel=0&stream=sub"
+
 ffmpeg:
   hwaccel_args: preset-vaapi
 
+detectors:
+  default:
+    type: openvino
+    device: AUTO
+    model:
+      path: /openvino-model/ssdlite_mobilenet_v2.xml
+
 detect:
-  width: 1280
-  height: 720
+  width: 640
+  height: 480
   fps: 5
 
 objects:
@@ -20,10 +42,11 @@ record:
   enabled: true
   retain:
     days: 14
-    mode: all
+    mode: motion
   events:
     retain:
       default: 14
+      mode: active_objects
 
 snapshots:
   enabled: true
@@ -34,10 +57,12 @@ cameras:
   doorbell:
     ffmpeg:
       inputs:
-        - path: rtsp://admin:{FRIGATE_DOORBELL_PASS}@192.168.1.10:554/h264Preview_01_main
+        - path: rtsp://127.0.0.1:8554/doorbell_main
+          input_args: preset-rtsp-restream
           roles:
             - record
-        - path: rtsp://admin:{FRIGATE_DOORBELL_PASS}@192.168.1.10:554/h264Preview_01_sub
+        - path: rtsp://127.0.0.1:8554/doorbell_sub
+          input_args: preset-rtsp-restream
           roles:
             - detect
     objects:
@@ -50,19 +75,23 @@ cameras:
   garage:
     ffmpeg:
       inputs:
-        - path: rtsp://admin:{FRIGATE_GARAGE_PASS}@192.168.1.11:554/h264Preview_01_main
+        - path: rtsp://127.0.0.1:8554/garage_main
+          input_args: preset-rtsp-restream
           roles:
             - record
-        - path: rtsp://admin:{FRIGATE_GARAGE_PASS}@192.168.1.11:554/h264Preview_01_sub
+        - path: rtsp://127.0.0.1:8554/garage_sub
+          input_args: preset-rtsp-restream
           roles:
             - detect
 
   living_room:
     ffmpeg:
       inputs:
-        - path: rtsp://admin:{FRIGATE_LIVING_ROOM_PASS}@192.168.1.12:554/h264Preview_01_main
+        - path: rtsp://127.0.0.1:8554/living_room_main
+          input_args: preset-rtsp-restream
           roles:
             - record
-        - path: rtsp://admin:{FRIGATE_LIVING_ROOM_PASS}@192.168.1.12:554/h264Preview_01_sub
+        - path: rtsp://127.0.0.1:8554/living_room_sub
+          input_args: preset-rtsp-restream
           roles:
             - detect
