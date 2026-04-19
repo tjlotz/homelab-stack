@@ -10,7 +10,8 @@ services:
       - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
       - ./plex/config:/config
-      - /mnt/media:/media
+      - /mnt/Public/Media/Movies:/media/Movies
+      - /mnt/Public/Media/TV Shows:/media/TV Shows
     restart: unless-stopped
 
   homeassistant:

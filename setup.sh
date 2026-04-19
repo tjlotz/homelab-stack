@@ -78,15 +78,22 @@ echo "[3/6] Mounting NAS shares..."
 
 apt-get install -y -qq cifs-utils
 
-# Public share (guest access) — /mnt/media
-mkdir -p /mnt/media
-if ! grep -q "//192.168.1.100/Public" /etc/fstab; then
-  echo "//192.168.1.100/Public /mnt/media cifs guest,iocharset=utf8,uid=${PUID:-1000},gid=${PGID:-1000},nofail,_netdev 0 0" >> /etc/fstab
-  echo "  Added /mnt/media to fstab (Public share, guest access)"
+# Public/Media/Movies (guest access)
+mkdir -p "/mnt/Public/Media/Movies"
+if ! grep -q "//192.168.1.100/Public/Media/Movies" /etc/fstab; then
+  echo '//192.168.1.100/Public/Media/Movies /mnt/Public/Media/Movies cifs guest,iocharset=utf8,uid='"${PUID:-1000}"',gid='"${PGID:-1000}"',nofail,_netdev 0 0' >> /etc/fstab
+  echo "  Added /mnt/Public/Media/Movies to fstab"
 fi
 
-# Cameras share (authenticated) — /mnt/cameras
-mkdir -p /mnt/cameras
+# Public/Media/TV Shows (guest access)
+mkdir -p "/mnt/Public/Media/TV Shows"
+if ! grep -q "Public/Media/TV" /etc/fstab; then
+  echo '//192.168.1.100/Public/Media/TV\040Shows /mnt/Public/Media/TV\040Shows cifs guest,iocharset=utf8,uid='"${PUID:-1000}"',gid='"${PGID:-1000}"',nofail,_netdev 0 0' >> /etc/fstab
+  echo "  Added /mnt/Public/Media/TV Shows to fstab"
+fi
+
+# Cameras share (authenticated)
+mkdir -p /mnt/Cameras
 mkdir -p /etc/samba
 CREDS_FILE="/etc/samba/credentials"
 
@@ -100,8 +107,8 @@ CRED
   chmod 600 "$CREDS_FILE"
 
   if ! grep -q "//192.168.1.100/Cameras" /etc/fstab; then
-    echo "//192.168.1.100/Cameras /mnt/cameras cifs credentials=${CREDS_FILE},iocharset=utf8,uid=${PUID:-1000},gid=${PGID:-1000},nofail,_netdev 0 0" >> /etc/fstab
-    echo "  Added /mnt/cameras to fstab (Cameras share, authenticated)"
+    echo "//192.168.1.100/Cameras /mnt/Cameras cifs credentials=${CREDS_FILE},iocharset=utf8,uid=${PUID:-1000},gid=${PGID:-1000},nofail,_netdev 0 0" >> /etc/fstab
+    echo "  Added /mnt/Cameras to fstab (authenticated)"
   fi
 fi
 
