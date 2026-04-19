@@ -13,11 +13,22 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 ## Hardware
 
 - **Server:** [Beelink S12](https://amazon.com/dp/B0BVFS94J5) (Ubuntu Server 24.04, headless)
-- **Storage:** WD MyCloud NAS at `192.168.1.100`
+- **Storage:** WD MyCloud NAS at `192.168.1.3`
   - `Public/Media/Movies` mounted at `/mnt/Public/Media/Movies`
   - `Public/Media/TV Shows` mounted at `/mnt/Public/Media/TV Shows`
   - `Cameras` share mounted at `/mnt/Cameras` (security footage, authenticated)
-- **Static IP:** `192.168.1.10`
+- **Static IP:** `192.168.1.2`
+
+## IP Allocation
+
+| Range | Device Type | Current Assignments |
+|-------|-------------|---------------------|
+| `.2-.9` | Infrastructure | `.2` BLACKBOX, `.3` WD MyCloud NAS |
+| `.10-.49` | Cameras | |
+| `.50-.99` | Lights | |
+| `.100-.149` | Switches/Plugs | |
+| `.150-.199` | Air Purifiers | |
+| `.200-.254` | Reserved | |
 
 ## Directory Structure
 
@@ -41,7 +52,7 @@ homelab-stack/
 
 - Fresh Ubuntu Server 24.04 install
 - Ethernet connection
-- WD MyCloud NAS accessible at `192.168.1.100`
+- WD MyCloud NAS accessible at `192.168.1.3`
 
 ### Steps
 
@@ -74,9 +85,9 @@ homelab-stack/
 
 | Service | URL |
 |---------|-----|
-| Plex | `http://192.168.1.10:32400/web` |
-| Home Assistant | `http://192.168.1.10:8123` |
-| Pi-hole | `http://192.168.1.10:8080/admin` |
+| Plex | `http://192.168.1.2:32400/web` |
+| Home Assistant | `http://192.168.1.2:8123` |
+| Pi-hole | `http://192.168.1.2:8080/admin` |
 
 ## License
 

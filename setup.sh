@@ -80,15 +80,15 @@ apt-get install -y -qq cifs-utils
 
 # Public/Media/Movies (guest access)
 mkdir -p "/mnt/Public/Media/Movies"
-if ! grep -q "//192.168.1.100/Public/Media/Movies" /etc/fstab; then
-  echo '//192.168.1.100/Public/Media/Movies /mnt/Public/Media/Movies cifs guest,iocharset=utf8,uid='"${PUID:-1000}"',gid='"${PGID:-1000}"',nofail,_netdev 0 0' >> /etc/fstab
+if ! grep -q "//192.168.1.3/Public/Media/Movies" /etc/fstab; then
+  echo '//192.168.1.3/Public/Media/Movies /mnt/Public/Media/Movies cifs guest,iocharset=utf8,uid='"${PUID:-1000}"',gid='"${PGID:-1000}"',nofail,_netdev 0 0' >> /etc/fstab
   echo "  Added /mnt/Public/Media/Movies to fstab"
 fi
 
 # Public/Media/TV Shows (guest access)
 mkdir -p "/mnt/Public/Media/TV Shows"
 if ! grep -q "Public/Media/TV" /etc/fstab; then
-  echo '//192.168.1.100/Public/Media/TV\040Shows /mnt/Public/Media/TV\040Shows cifs guest,iocharset=utf8,uid='"${PUID:-1000}"',gid='"${PGID:-1000}"',nofail,_netdev 0 0' >> /etc/fstab
+  echo '//192.168.1.3/Public/Media/TV\040Shows /mnt/Public/Media/TV\040Shows cifs guest,iocharset=utf8,uid='"${PUID:-1000}"',gid='"${PGID:-1000}"',nofail,_netdev 0 0' >> /etc/fstab
   echo "  Added /mnt/Public/Media/TV Shows to fstab"
 fi
 
@@ -106,8 +106,8 @@ password=${NAS_CAMERAS_PASS}
 CRED
   chmod 600 "$CREDS_FILE"
 
-  if ! grep -q "//192.168.1.100/Cameras" /etc/fstab; then
-    echo "//192.168.1.100/Cameras /mnt/Cameras cifs credentials=${CREDS_FILE},iocharset=utf8,uid=${PUID:-1000},gid=${PGID:-1000},nofail,_netdev 0 0" >> /etc/fstab
+  if ! grep -q "//192.168.1.3/Cameras" /etc/fstab; then
+    echo "//192.168.1.3/Cameras /mnt/Cameras cifs credentials=${CREDS_FILE},iocharset=utf8,uid=${PUID:-1000},gid=${PGID:-1000},nofail,_netdev 0 0" >> /etc/fstab
     echo "  Added /mnt/Cameras to fstab (authenticated)"
   fi
 fi
