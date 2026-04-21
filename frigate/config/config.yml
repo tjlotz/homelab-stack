@@ -9,13 +9,21 @@ auth:
 
 ffmpeg:
   hwaccel_args: preset-vaapi
+  output_args:
+    record: preset-record-generic-audio-aac
 
 detectors:
   default:
     type: openvino
     device: AUTO
-    model:
-      path: /openvino-model/ssdlite_mobilenet_v2.xml
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  path: /openvino-model/ssdlite_mobilenet_v2.xml
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
 
 detect:
   width: 640
@@ -40,7 +48,6 @@ record:
     retain:
       default: 4
       mode: active_objects
-    audio: true
 
 snapshots:
   enabled: true
@@ -77,7 +84,6 @@ cameras:
           input_args: preset-rtsp-restream
           roles:
             - record
-            - audio
         - path: rtsp://127.0.0.1:8554/doorbell_sub
           input_args: preset-rtsp-restream
           roles:
@@ -90,7 +96,6 @@ cameras:
           input_args: preset-rtsp-restream
           roles:
             - record
-            - audio
         - path: rtsp://127.0.0.1:8554/garage_sub
           input_args: preset-rtsp-restream
           roles:
@@ -103,7 +108,6 @@ cameras:
           input_args: preset-rtsp-restream
           roles:
             - record
-            - audio
         - path: rtsp://127.0.0.1:8554/living_room_sub
           input_args: preset-rtsp-restream
           roles:
@@ -116,7 +120,6 @@ cameras:
           input_args: preset-rtsp-restream
           roles:
             - record
-            - audio
         - path: rtsp://127.0.0.1:8554/office_sub
           input_args: preset-rtsp-restream
           roles:
