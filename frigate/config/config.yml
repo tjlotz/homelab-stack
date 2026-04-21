@@ -1,6 +1,11 @@
 mqtt:
   host: 192.168.1.2
   port: 1883
+  user: "{FRIGATE_MQTT_USER}"
+  password: "{FRIGATE_MQTT_PASSWORD}"
+
+auth:
+  enabled: true
 
 ffmpeg:
   hwaccel_args: preset-vaapi
@@ -23,6 +28,9 @@ objects:
     - cat
     - dog
 
+# Retention: 4-day rolling window for event recordings + snapshots.
+# Cleanup runs daily, so footage age oscillates between 72h (just after cleanup)
+# and 96h (just before next cleanup), satisfying the "store ~72h, delete on day 4" spec.
 record:
   enabled: true
   retain:
@@ -30,23 +38,60 @@ record:
     mode: all
   events:
     retain:
-      default: 14
+      default: 4
       mode: active_objects
+    audio: true
 
 snapshots:
   enabled: true
   retain:
-    default: 14
+    default: 4
+
+# Centralize RTSP connections through Frigate's bundled go2rtc.
+# This gives a single connection per camera (vs one per role) and exposes
+# WebRTC streams that Home Assistant can consume via the Frigate HACS integration.
+go2rtc:
+  streams:
+    doorbell:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.10:554/h264Preview_01_main
+    doorbell_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.10:554/h264Preview_01_sub
+    garage:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.11:554/h264Preview_01_main
+    garage_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.11:554/h264Preview_01_sub
+    living_room:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.12:554/h264Preview_01_main
+    living_room_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.12:554/h264Preview_01_sub
+    office:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.13:554/h264Preview_01_main
+    office_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.13:554/h264Preview_01_sub
 
 cameras:
-  garage:
+  doorbell:
     ffmpeg:
       inputs:
-        - path: rtsp://192.168.1.2:8554/01KPKSRWT1AMB9R6R0HJB05SZ1_main
+        - path: rtsp://127.0.0.1:8554/doorbell
           input_args: preset-rtsp-restream
           roles:
             - record
-        - path: rtsp://192.168.1.2:8554/01KPKSRWT1AMB9R6R0HJB05SZ1_sub
+            - audio
+        - path: rtsp://127.0.0.1:8554/doorbell_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+
+  garage:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/garage
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+            - audio
+        - path: rtsp://127.0.0.1:8554/garage_sub
           input_args: preset-rtsp-restream
           roles:
             - detect
@@ -54,11 +99,25 @@ cameras:
   living_room:
     ffmpeg:
       inputs:
-        - path: rtsp://192.168.1.2:8554/01KPKST9VTEMJ2A682S7ZAV9DV_main
+        - path: rtsp://127.0.0.1:8554/living_room
           input_args: preset-rtsp-restream
           roles:
             - record
-        - path: rtsp://192.168.1.2:8554/01KPKST9VTEMJ2A682S7ZAV9DV_sub
+            - audio
+        - path: rtsp://127.0.0.1:8554/living_room_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+
+  office:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/office
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+            - audio
+        - path: rtsp://127.0.0.1:8554/office_sub
           input_args: preset-rtsp-restream
           roles:
             - detect

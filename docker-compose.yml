@@ -62,9 +62,15 @@ services:
     shm_size: "256mb"
     ports:
       - "5000:5000"
+      - "8554:8554"
+      - "8555:8555/tcp"
+      - "8555:8555/udp"
       - "8971:8971"
     environment:
-      - FRIGATE_MQTT_PASSWORD=
+      - FRIGATE_RTSP_USER=${REOLINK_USER}
+      - FRIGATE_RTSP_PASSWORD=${REOLINK_PASS}
+      - FRIGATE_MQTT_USER=${MQTT_USER}
+      - FRIGATE_MQTT_PASSWORD=${MQTT_PASS}
     volumes:
       - ./frigate/config:/config
       - /mnt/Cameras:/media/frigate

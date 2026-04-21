@@ -33,7 +33,7 @@ echo "========================================="
 # --- Install Docker ---
 
 echo ""
-echo "[1/6] Installing Docker..."
+echo "[1/7] Installing Docker..."
 
 if command -v docker &>/dev/null; then
   echo "  Docker already installed: $(docker --version)"
@@ -62,7 +62,7 @@ fi
 # --- Create service config directories ---
 
 echo ""
-echo "[2/6] Creating service config directories..."
+echo "[2/7] Creating service config directories..."
 
 mkdir -p "${REPO_DIR}/plex/config"
 mkdir -p "${REPO_DIR}/homeassistant/config"
@@ -78,7 +78,7 @@ echo "  Done."
 # --- Mount NAS shares ---
 
 echo ""
-echo "[3/6] Mounting NAS shares..."
+echo "[3/7] Mounting NAS shares..."
 
 apt-get install -y -qq cifs-utils
 
@@ -122,7 +122,7 @@ echo "  Done."
 # --- Blacklist mt76x2u WiFi driver ---
 
 echo ""
-echo "[4/6] Blacklisting mt76x2u WiFi driver..."
+echo "[4/7] Blacklisting mt76x2u WiFi driver..."
 
 BLACKLIST_FILE="/etc/modprobe.d/blacklist-mt76x2u.conf"
 if [[ ! -f "$BLACKLIST_FILE" ]]; then
@@ -135,7 +135,7 @@ fi
 # --- Install MOTD ---
 
 echo ""
-echo "[5/6] Installing BLACKBOX MOTD..."
+echo "[5/7] Installing BLACKBOX MOTD..."
 
 # Disable default MOTD components
 chmod -x /etc/update-motd.d/* 2>/dev/null || true
@@ -148,7 +148,7 @@ echo "  Done."
 # --- Set hostname ---
 
 echo ""
-echo "[6/6] Setting hostname to 'blackbox'..."
+echo "[6/7] Setting hostname to 'blackbox'..."
 
 CURRENT_HOSTNAME=$(hostname)
 if [[ "$CURRENT_HOSTNAME" != "blackbox" ]]; then
@@ -157,6 +157,26 @@ if [[ "$CURRENT_HOSTNAME" != "blackbox" ]]; then
   echo "  Hostname changed from '${CURRENT_HOSTNAME}' to 'blackbox'"
 else
   echo "  Hostname already set to 'blackbox'."
+fi
+
+# --- Generate Mosquitto password file ---
+
+echo ""
+echo "[7/7] Generating Mosquitto password file..."
+
+MQTT_PASSWD_FILE="${REPO_DIR}/mosquitto/config/passwd"
+if [[ -z "${MQTT_USER:-}" || -z "${MQTT_PASS:-}" ]]; then
+  echo "  Warning: MQTT_USER or MQTT_PASS not set in .env — skipping."
+  echo "  Frigate <-> HA MQTT will fail until this file exists."
+elif [[ -f "$MQTT_PASSWD_FILE" ]]; then
+  echo "  Already exists at ${MQTT_PASSWD_FILE}. Delete it to regenerate."
+else
+  docker run --rm \
+    -v "${REPO_DIR}/mosquitto/config:/mosquitto/config" \
+    eclipse-mosquitto:2 \
+    mosquitto_passwd -b -c /mosquitto/config/passwd "$MQTT_USER" "$MQTT_PASS"
+  chmod 600 "$MQTT_PASSWD_FILE"
+  echo "  Created ${MQTT_PASSWD_FILE} (hashed)"
 fi
 
 echo ""

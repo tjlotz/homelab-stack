@@ -9,8 +9,8 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 | **Plex** | `32400` (host network) | Media server streaming from NAS |
 | **Home Assistant** | `8123` (host network) | Home automation platform |
 | **Pi-hole** | `53` (DNS), `8080` (web UI) | Network-wide ad blocking |
-| **Frigate** | `5000` (web UI), `8971` (API) | Local NVR with event-based object detection (OpenVINO + Intel Quick Sync) |
-| **Mosquitto** | `1883` | MQTT broker for Frigate/HA communication |
+| **Frigate** | `5000` (web UI), `8554` (RTSP), `8555` (WebRTC), `8971` (auth API) | Local NVR with event-based object detection (OpenVINO + Intel Quick Sync). Authentication enabled. |
+| **Mosquitto** | `1883` | MQTT broker for Frigate ↔ HA. Authentication required. |
 
 ## Hardware
 
@@ -26,64 +26,77 @@ Docker Compose configuration for **BLACKBOX** — a self-hosted homelab running 
 ### Architecture
 
 ```
-Reolink E1 Zoom Cameras (.11, .12)
-  └── HA Reolink Integration (Baichuan protocol, port 9000)
-        └── HA built-in go2rtc (RTSP restream :8554)
-              ├── Frigate (object detection + event recording)
-              └── HA dashboard (live view)
-
-  Object detection: person, cat, dog
-  Hardware decode:  Intel Quick Sync (vaapi, N100 iGPU)
-  AI detector:      OpenVINO (CPU)
-  Recording:        /mnt/Cameras — events only, 14-day retention
-
-  Home Assistant ◄── Frigate integration (MQTT) ── Frigate
-
-Reolink Doorbell D340B (.10)
-  └── Reolink app only (no local API — see Issue #6)
+Reolink Cameras (RTSP :554)
+  ├── Doorbell    192.168.1.10  (D340W, wired)
+  ├── Garage      192.168.1.11  (E1 Pro)
+  ├── Living Room 192.168.1.12  (E1 Pro)
+  └── Office      192.168.1.13  (E1 Pro)
+        │
+        └── Frigate (bundled go2rtc — single RTSP connection per camera)
+              ├── Detect: sub-stream @ 640x480 5fps, OpenVINO
+              ├── Record: main-stream + audio, event-only
+              ├── Decode: Intel Quick Sync (vaapi, N100 iGPU)
+              ├── Storage: /mnt/Cameras (4-day rolling retention)
+              └── MQTT (authenticated) ── Home Assistant (Frigate HACS integration)
 ```
 
-- **Home Assistant** is the central hub — Reolink integration connects to E1 Zoom cameras via Baichuan protocol on port 9000
-- **HA's built-in go2rtc** restreams camera feeds as RTSP, consumed by both Frigate and HA's dashboard
-- **Frigate** handles object detection and event-only recording to NAS
-- **Doorbell** is not integrated — battery-powered D340B has no local API. Requires a Reolink Home Hub for HA integration (see [Issue #6](https://github.com/tjlotz/homelab-stack/issues/6))
-- **E1 Zoom cameras** require "Basic Services Port" set to `9000` in the Reolink app
+- **Frigate** is the single video pipeline. Cameras connect via native RTSP — no HA Reolink integration, no go2rtc HA add-on.
+- **Bundled go2rtc** inside Frigate centralizes camera connections (one connection per camera, restreamed for both detect and record roles).
+- **Home Assistant** consumes cameras, events, and recordings via the Frigate HACS integration over authenticated MQTT.
+- **Object detection:** `person`, `cat`, `dog`. Recording triggers only on these.
+- **Audio** is captured on event clips.
 
 ### Recording
 
 | Setting | Value |
 |---------|-------|
 | Continuous recording | Disabled |
-| Event recording | High-res main stream (person, animal triggers) |
-| Retention | 14 days for event recordings and snapshots |
+| Event recording | High-res main stream + audio (person, cat, dog triggers) |
+| Retention | 4-day rolling window for events and snapshots (`mode: active_objects`). Cleanup runs daily, so footage age oscillates between ~72h and ~96h. |
 | Storage | NAS at `/mnt/Cameras` |
+
+### Camera Setup
+
+Each Reolink camera must be configured (via the Reolink phone app) with:
+
+- **Static IP** in the `.10–.13` range (see IP Allocation below)
+- **Admin user:** `admin`
+- **Admin password:** the same shared password set in `.env` as `REOLINK_PASS` (20+ char alphanumeric, stored in your password manager)
+- **RTSP enabled** (default on D340W and E1 Pro)
 
 ### Home Assistant Setup
 
-These integrations are configured via the HA web UI at `http://192.168.1.2:8123`:
+Configured via the HA web UI at `http://192.168.1.2:8123`:
 
-1. **Reolink integration** — add each E1 Zoom camera by IP:
-   - Settings → Devices & Services → Add Integration → Reolink
-   - Enter camera IP, username, and password
-   - The integration connects via Baichuan protocol on port 9000
-   - Note: the doorbell (D340B) cannot be added — see [Issue #6](https://github.com/tjlotz/homelab-stack/issues/6)
+1. **MQTT integration** — connect HA to Mosquitto:
+   - Settings → Devices & Services → Add Integration → MQTT
+   - Broker: `192.168.1.2`, Port: `1883`
+   - Username: `admin`, Password: matches `MQTT_PASS` in `.env`
 
 2. **Frigate integration** (via HACS):
    - Install HACS in HA if not already installed
    - Install the Frigate integration from HACS
-   - Configure with MQTT (Mosquitto at `192.168.1.2:1883`)
+   - Point it at `http://192.168.1.2:5000`
    - All cameras, events, and recordings appear in HA automatically
 
-3. **Mosquitto MQTT broker** — HA connects to the existing Mosquitto container:
-   - Settings → Devices & Services → Add Integration → MQTT
-   - Broker: `192.168.1.2`, Port: `1883`
+The previous HA Reolink integration is no longer used — remove it from Settings → Devices & Services if present. Also remove any `go2rtc:` block from `/config/configuration.yaml` (added during the prior Baichuan-based attempt; no longer needed).
+
+### Security
+
+- All services are **LAN-only**. No port forwarding for the camera stack.
+- **MQTT** requires authentication (`admin` + password from `.env`, hashed into `mosquitto/config/passwd` by `setup.sh`).
+- **Frigate web UI** requires authentication (set up on first login at `:5000`).
+- **`.env`** holds plaintext secrets — kept `chmod 600` and gitignored. Acceptable for a single-host LAN deployment; revisit if remote access changes the threat model.
+- **Deferred** (tracked in GitHub issues):
+  - Remote access to HA / Frigate / Plex via Tailscale (Issue #5). This will also remove the need to expose SSH on the public internet.
+  - Block Reolink cameras from WAN egress at the router (separate issue).
 
 ## IP Allocation
 
 | Range | Device Type | Current Assignments |
 |-------|-------------|---------------------|
 | `.2-.9` | Infrastructure | `.2` BLACKBOX, `.3` WD MyCloud NAS |
-| `.10-.49` | Cameras | `.10` Doorbell (D340B, Reolink app only), `.11` Garage (E1 Zoom), `.12` Living Room (E1 Zoom) |
+| `.10-.49` | Cameras | `.10` Doorbell (D340W), `.11` Garage (E1 Pro), `.12` Living Room (E1 Pro), `.13` Office (E1 Pro) |
 | `.50-.99` | Lights | |
 | `.100-.149` | Switches/Plugs | |
 | `.150-.199` | Air Purifiers | |
@@ -100,10 +113,11 @@ homelab-stack/
 │   └── blackbox-motd.sh    # SSH login banner
 ├── frigate/
 │   └── config/
-│       └── config.yml      # Frigate NVR configuration
+│       └── config.yml      # Frigate NVR configuration (cameras, retention, go2rtc)
 ├── mosquitto/
 │   └── config/
-│       └── mosquitto.conf  # MQTT broker configuration
+│       ├── mosquitto.conf  # MQTT broker configuration (auth required)
+│       └── passwd          # Hashed MQTT credentials (gitignored, generated by setup.sh)
 ├── plex/config/            # Plex persistent data (gitignored)
 ├── homeassistant/config/   # Home Assistant persistent data (gitignored)
 └── pihole/
@@ -118,6 +132,7 @@ homelab-stack/
 - Fresh Ubuntu Server 24.04 install
 - Ethernet connection
 - WD MyCloud NAS accessible at `192.168.1.3`
+- Reolink cameras configured with static IPs and the shared admin password
 
 ### Steps
 
@@ -130,21 +145,24 @@ homelab-stack/
 2. Create your environment file:
    ```bash
    cp .env.example .env
+   chmod 600 .env
    nano .env
    ```
-   Fill in your timezone, Plex claim token (get one at https://www.plex.tv/claim), Pi-hole password, and NAS credentials. Camera credentials are configured via the HA web UI (see Home Assistant Setup above).
+   Fill in: timezone, Plex claim token (https://www.plex.tv/claim), Pi-hole password, NAS credentials, Reolink admin password, MQTT password.
 
 3. Run the setup script:
    ```bash
    sudo bash setup.sh
    ```
-   This installs Docker, mounts the NAS shares, installs the BLACKBOX MOTD, and blacklists the problematic WiFi driver.
+   This installs Docker, mounts NAS shares, installs the BLACKBOX MOTD, blacklists the problematic WiFi driver, and generates the hashed Mosquitto password file.
 
 4. Log out and back in (to pick up the `docker` group), then start the stack:
    ```bash
    cd /opt/homelab-stack
    docker compose up -d
    ```
+
+5. In the HA UI, configure the MQTT and Frigate integrations (see Home Assistant Setup above).
 
 ### Accessing Services
 
@@ -153,7 +171,7 @@ homelab-stack/
 | Plex | `http://192.168.1.2:32400/web` |
 | Home Assistant | `http://192.168.1.2:8123` |
 | Pi-hole | `http://192.168.1.2:8080/admin` |
-| Frigate | `http://192.168.1.2:5000` |
+| Frigate | `http://192.168.1.2:5000` (auth required) |
 
 ## License
 
