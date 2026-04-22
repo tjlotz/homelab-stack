@@ -30,7 +30,8 @@ Reolink Cameras (RTSP :554)
   ├── Doorbell    192.168.1.10  (D340W, wired)
   ├── Garage      192.168.1.11  (E1 Pro)
   ├── Living Room 192.168.1.12  (E1 Pro)
-  └── Office      192.168.1.13  (E1 Pro)
+  ├── Office      192.168.1.13  (E1 Pro)
+  └── Driveway    192.168.1.14  (Lumus Pro E450)
         │
         └── Frigate (bundled go2rtc — single RTSP connection per camera)
               ├── Detect: sub-stream @ 640x480 5fps, OpenVINO
