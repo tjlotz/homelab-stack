@@ -44,7 +44,7 @@ Reolink Cameras (RTSP :554)
 - **Frigate** is the single video pipeline. Cameras connect via native RTSP — no HA Reolink integration, no go2rtc HA add-on.
 - **Bundled go2rtc** inside Frigate centralizes camera connections (one connection per camera, restreamed for both detect and record roles).
 - **Home Assistant** consumes cameras, events, and recordings via the Frigate HACS integration over authenticated MQTT.
-- **Object detection:** `person`, `cat`, `dog` on all cameras. Driveway also tracks `car`, filtered to `parking_zone` and `driveway_zone` to ignore street traffic. Recording triggers only on these.
+- **Object detection:** `person`, `cat`, `dog`. Recording triggers only on these.
 - **Audio** is captured on event clips.
 
 ### Recording
@@ -52,7 +52,7 @@ Reolink Cameras (RTSP :554)
 | Setting | Value |
 |---------|-------|
 | Continuous recording | Disabled |
-| Event recording | High-res main stream + audio (person, cat, dog triggers; car on driveway in zones) |
+| Event recording | High-res main stream + audio (person, cat, dog triggers) |
 | Retention | 4-day rolling window for events and snapshots (`mode: active_objects`). Cleanup runs daily, so footage age oscillates between ~72h and ~96h. |
 | Storage | NAS at `/mnt/Cameras` |
 
