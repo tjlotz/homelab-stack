@@ -89,8 +89,51 @@ The previous HA Reolink integration is no longer used — remove it from Setting
 - **Frigate web UI** requires authentication (set up on first login at `:5000`).
 - **`.env`** holds plaintext secrets — kept `chmod 600` and gitignored. Acceptable for a single-host LAN deployment; revisit if remote access changes the threat model.
 - **Deferred** (tracked in GitHub issues):
-  - Remote access to HA / Frigate / Plex via Tailscale (Issue #5). This will also remove the need to expose SSH on the public internet.
-  - Block Reolink cameras from WAN egress at the router (separate issue).
+  - Block Reolink cameras from WAN egress at the router (Issue #7).
+
+## Remote Access
+
+Remote access to BLACKBOX services is handled by [Tailscale](https://tailscale.com), a zero-config WireGuard-based VPN. Tailscale runs natively on the host (not in Docker) and acts as a **subnet router** for the LAN, so client devices on the tailnet can reach all services — including Reolink cameras, which can't run a Tailscale client themselves.
+
+### Architecture
+
+- Tailscale installed via the official apt repo by `setup.sh`.
+- Hostname: `blackbox`. With MagicDNS enabled, services are reachable at `blackbox.<your-tailnet>.ts.net`.
+- Subnet route: `192.168.1.0/24` advertised from `blackbox`, gated by approval in the Tailscale admin console.
+- Node tag: `tag:server` (so the node is owned by the tailnet rather than a personal user account).
+- IPv4 forwarding enabled in `/etc/sysctl.d/99-tailscale.conf`. IPv6 forwarding intentionally left off (LAN devices we route to are IPv4-only).
+- Default tailnet ACL (single user, all-allow). No exit node.
+
+### One-time bring-up
+
+After `setup.sh` finishes installing Tailscale:
+
+```bash
+sudo tailscale up \
+  --hostname=blackbox \
+  --advertise-routes=192.168.1.0/24 \
+  --advertise-tags=tag:server
+```
+
+Then in the [Tailscale admin console](https://login.tailscale.com/admin/):
+
+1. **ACL policy** — define `tag:server` with your user as the owner (required before the tag can be assigned).
+2. **Subnet routes** — approve the `192.168.1.0/24` route advertised by `blackbox`.
+3. **Key expiry** — disable for the `blackbox` node so the server doesn't drop off the tailnet every 90 days.
+4. **MagicDNS** — enable under DNS settings.
+
+### Accessing services remotely
+
+Once the node is up, joined to the tailnet, and approved, install the Tailscale client on any device (phone, laptop) and sign in to the same tailnet. Services are reachable at:
+
+| Service | URL over Tailscale |
+|---------|--------------------|
+| Home Assistant | `http://blackbox.<tailnet>.ts.net:8123` |
+| Plex | `http://blackbox.<tailnet>.ts.net:32400/web` |
+| Frigate | `http://blackbox.<tailnet>.ts.net:5000` |
+| Reolink cameras | `http://192.168.1.10`–`.14` (via the subnet route) |
+
+Adding a new client device: install Tailscale, sign in to the same tailnet, and you're done — no per-service configuration needed.
 
 ## IP Allocation
 
@@ -155,7 +198,7 @@ homelab-stack/
    ```bash
    sudo bash setup.sh
    ```
-   This installs Docker, mounts NAS shares, installs the BLACKBOX MOTD, blacklists the problematic WiFi driver, and generates the hashed Mosquitto password file.
+   This installs Docker and Tailscale, mounts NAS shares, installs the BLACKBOX MOTD, blacklists the problematic WiFi driver, enables IPv4 forwarding for Tailscale subnet routing, and generates the hashed Mosquitto password file.
 
 4. Log out and back in (to pick up the `docker` group), then start the stack:
    ```bash
@@ -163,7 +206,16 @@ homelab-stack/
    docker compose up -d
    ```
 
-5. In the HA UI, configure the MQTT and Frigate integrations (see Home Assistant Setup above).
+5. Join the tailnet (one-time):
+   ```bash
+   sudo tailscale up \
+     --hostname=blackbox \
+     --advertise-routes=192.168.1.0/24 \
+     --advertise-tags=tag:server
+   ```
+   Follow the printed URL to authenticate. Then complete the Tailscale admin console steps in the [Remote Access](#remote-access) section above (define `tag:server`, approve the subnet route, disable key expiry, enable MagicDNS).
+
+6. In the HA UI, configure the MQTT and Frigate integrations (see Home Assistant Setup above).
 
 ### Accessing Services
 

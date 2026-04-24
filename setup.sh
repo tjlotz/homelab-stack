@@ -33,7 +33,7 @@ echo "========================================="
 # --- Install Docker ---
 
 echo ""
-echo "[1/7] Installing Docker..."
+echo "[1/9] Installing Docker..."
 
 if command -v docker &>/dev/null; then
   echo "  Docker already installed: $(docker --version)"
@@ -62,7 +62,7 @@ fi
 # --- Create service config directories ---
 
 echo ""
-echo "[2/7] Creating service config directories..."
+echo "[2/9] Creating service config directories..."
 
 mkdir -p "${REPO_DIR}/plex/config"
 mkdir -p "${REPO_DIR}/homeassistant/config"
@@ -78,7 +78,7 @@ echo "  Done."
 # --- Mount NAS shares ---
 
 echo ""
-echo "[3/7] Mounting NAS shares..."
+echo "[3/9] Mounting NAS shares..."
 
 apt-get install -y -qq cifs-utils
 
@@ -122,7 +122,7 @@ echo "  Done."
 # --- Blacklist mt76x2u WiFi driver ---
 
 echo ""
-echo "[4/7] Blacklisting mt76x2u WiFi driver..."
+echo "[4/9] Blacklisting mt76x2u WiFi driver..."
 
 BLACKLIST_FILE="/etc/modprobe.d/blacklist-mt76x2u.conf"
 if [[ ! -f "$BLACKLIST_FILE" ]]; then
@@ -132,10 +132,59 @@ else
   echo "  Already blacklisted."
 fi
 
+# --- Enable IPv4 forwarding (for Tailscale subnet routing) ---
+
+echo ""
+echo "[5/9] Enabling IPv4 forwarding for Tailscale subnet routing..."
+
+SYSCTL_FILE="/etc/sysctl.d/99-tailscale.conf"
+if [[ ! -f "$SYSCTL_FILE" ]]; then
+  cat > "$SYSCTL_FILE" <<'EOF'
+# Required for Tailscale subnet routing (192.168.1.0/24).
+# IPv6 forwarding intentionally left disabled — LAN devices we route to
+# (Reolink cameras, NAS) are IPv4-only.
+net.ipv4.ip_forward = 1
+EOF
+  sysctl --system >/dev/null
+  echo "  Created ${SYSCTL_FILE} and applied."
+else
+  echo "  ${SYSCTL_FILE} already exists."
+fi
+
+# --- Install Tailscale ---
+
+echo ""
+echo "[6/9] Installing Tailscale..."
+
+if command -v tailscale &>/dev/null; then
+  echo "  Tailscale already installed: $(tailscale version | head -1)"
+else
+  apt-get install -y -qq curl gnupg
+
+  # Official Tailscale apt repo (Ubuntu noble = 24.04)
+  UBUNTU_CODENAME="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+  curl -fsSL "https://pkgs.tailscale.com/stable/ubuntu/${UBUNTU_CODENAME}.noarmor.gpg" \
+    -o /usr/share/keyrings/tailscale-archive-keyring.gpg
+  curl -fsSL "https://pkgs.tailscale.com/stable/ubuntu/${UBUNTU_CODENAME}.tailscale-keyring.list" \
+    -o /etc/apt/sources.list.d/tailscale.list
+
+  apt-get update -qq
+  apt-get install -y -qq tailscale
+
+  systemctl enable --now tailscaled
+
+  echo "  Tailscale installed: $(tailscale version | head -1)"
+  echo "  Run the following manually to join the tailnet (one-time):"
+  echo "    sudo tailscale up --hostname=blackbox \\"
+  echo "      --advertise-routes=192.168.1.0/24 \\"
+  echo "      --advertise-tags=tag:server"
+  echo "  Then approve the subnet route + disable key expiry in the Tailscale admin console."
+fi
+
 # --- Install MOTD ---
 
 echo ""
-echo "[5/7] Installing BLACKBOX MOTD..."
+echo "[7/9] Installing BLACKBOX MOTD..."
 
 # Disable default MOTD components
 chmod -x /etc/update-motd.d/* 2>/dev/null || true
@@ -148,7 +197,7 @@ echo "  Done."
 # --- Set hostname ---
 
 echo ""
-echo "[6/7] Setting hostname to 'blackbox'..."
+echo "[8/9] Setting hostname to 'blackbox'..."
 
 CURRENT_HOSTNAME=$(hostname)
 if [[ "$CURRENT_HOSTNAME" != "blackbox" ]]; then
@@ -162,7 +211,7 @@ fi
 # --- Generate Mosquitto password file ---
 
 echo ""
-echo "[7/7] Generating Mosquitto password file..."
+echo "[9/9] Generating Mosquitto password file..."
 
 MQTT_PASSWD_FILE="${REPO_DIR}/mosquitto/config/passwd"
 if [[ -z "${MQTT_USER:-}" || -z "${MQTT_PASS:-}" ]]; then
@@ -188,4 +237,13 @@ echo "Next steps:"
 echo "  1. Log out and back in (for docker group membership)"
 echo "  2. cd ${REPO_DIR}"
 echo "  3. docker compose up -d"
+echo "  4. Join the tailnet (one-time, if not already):"
+echo "       sudo tailscale up --hostname=blackbox \\"
+echo "         --advertise-routes=192.168.1.0/24 \\"
+echo "         --advertise-tags=tag:server"
+echo "     Then in the Tailscale admin console:"
+echo "       - Define tag:server in the ACL policy"
+echo "       - Approve the 192.168.1.0/24 subnet route from blackbox"
+echo "       - Disable key expiry for the blackbox node"
+echo "       - Enable MagicDNS"
 echo ""
