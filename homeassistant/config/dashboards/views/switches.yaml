@@ -1,0 +1,93 @@
+# Switches & Plugs view — Linkind (Zigbee) + iHome (Wi-Fi) outlets.
+# Both surface as `switch.*` entities once their respective integrations
+# are configured.
+
+title: Switches & Plugs
+path: switches
+icon: mdi:power-socket-us
+type: sections
+max_columns: 2
+sections:
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Master
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:button-card
+            template: quick_action_chip
+            name: All on
+            icon: mdi:power-plug
+            tap_action:
+              action: call-service
+              service: switch.turn_on
+              service_data:
+                entity_id: all
+          - type: custom:button-card
+            template: quick_action_chip
+            name: All off
+            icon: mdi:power-plug-off
+            tap_action:
+              action: call-service
+              service: switch.turn_off
+              service_data:
+                entity_id: all
+
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: All switches
+
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: switch
+              options:
+                type: custom:mushroom-entity-card
+                tap_action:
+                  action: toggle
+                hold_action:
+                  action: more-info
+                icon: mdi:power-socket-us
+        exclude:
+          # Hide system / integration switches that aren't user-facing plugs.
+          - attributes:
+              device_class: outlet
+            invert: true
+            optional: true
+        sort:
+          method: friendly_name
+
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Currently on
+
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: switch
+              state: "on"
+              options:
+                type: custom:mushroom-entity-card
+                icon: mdi:power-socket-us
+                tap_action:
+                  action: toggle

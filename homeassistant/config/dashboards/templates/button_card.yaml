@@ -1,0 +1,209 @@
+# Reusable button-card templates for the iOS Hub dashboard.
+# Inspired by the reference dashboard at ~/Downloads/config.yaml — adapted
+# for this homelab's actual entity inventory.
+#
+# Usage in a card: `template: room_tile` (or whatever name).
+
+# ---------------------------------------------------------------------------
+# Base — applied to every card. Sets typography, border-radius, padding.
+# ---------------------------------------------------------------------------
+base:
+  show_icon: true
+  show_name: true
+  show_state: false
+  styles:
+    card:
+      - border-radius: 18px
+      - background-color: "rgba(28, 30, 35, 0.85)"
+      - padding: 14px
+      - box-shadow: "0 4px 18px rgba(0, 0, 0, 0.35)"
+    name:
+      - color: "#ffffff"
+      - font-size: 15px
+      - font-weight: "500"
+      - justify-self: start
+    state:
+      - color: "rgba(235, 235, 245, 0.6)"
+      - font-size: 13px
+      - justify-self: start
+    icon:
+      - color: "#ffffff"
+      - width: 22px
+
+# ---------------------------------------------------------------------------
+# room_tile — large tile shown on the Home view, navigates to a room view.
+#   variables:
+#     var_name:        display label
+#     var_icon:        mdi icon
+#     var_path:        navigation path (e.g. "#office" or "/lovelace-ios-hub/rooms")
+#     var_lights:      light group entity (state shown as on/off summary)
+#     var_temp:        temperature sensor entity (shown as pill)
+# ---------------------------------------------------------------------------
+room_tile:
+  template: base
+  variables:
+    var_name: Room
+    var_icon: mdi:floor-plan
+    var_path: ""
+    var_lights: ""
+    var_temp: ""
+  name: "[[[ return variables.var_name ]]]"
+  icon: "[[[ return variables.var_icon ]]]"
+  show_state: false
+  tap_action:
+    action: navigate
+    navigation_path: "[[[ return variables.var_path ]]]"
+  styles:
+    card:
+      - border-radius: 18px
+      - background-color: "rgba(28, 30, 35, 0.85)"
+      - padding: 14px
+      - height: 110px
+      - box-shadow: "0 4px 18px rgba(0, 0, 0, 0.35)"
+    grid:
+      - grid-template-areas: '"i temp" "n n" "s s"'
+      - grid-template-columns: 1fr min-content
+      - grid-template-rows: min-content 1fr min-content
+    img_cell:
+      - justify-self: start
+      - background-color: "rgba(10, 132, 255, 0.18)"
+      - border-radius: 50%
+      - width: 36px
+      - height: 36px
+      - place-self: start
+    icon:
+      - color: "#0a84ff"
+      - width: 22px
+    name:
+      - color: "#ffffff"
+      - font-size: 16px
+      - font-weight: "600"
+      - justify-self: start
+      - align-self: end
+  custom_fields:
+    temp:
+      card:
+        type: custom:button-card
+        entity: "[[[ return variables.var_temp ]]]"
+        show_name: false
+        show_icon: false
+        show_state: true
+        styles:
+          card:
+            - background: "rgba(255, 255, 255, 0.08)"
+            - border-radius: 12px
+            - padding: 4px 8px
+            - height: 24px
+            - box-shadow: none
+          state:
+            - color: "#ffffff"
+            - font-size: 12px
+            - font-weight: "500"
+
+# ---------------------------------------------------------------------------
+# accessory_tile — generic on/off accessory (light, switch, fan).
+#   Tap toggles. Hold opens more-info.
+# ---------------------------------------------------------------------------
+accessory_tile:
+  template: base
+  show_state: true
+  tap_action:
+    action: toggle
+  hold_action:
+    action: more-info
+  state:
+    - value: "on"
+      styles:
+        card:
+          - background-color: "rgba(255, 214, 10, 0.18)"
+          - border: "1px solid rgba(255, 214, 10, 0.35)"
+        icon:
+          - color: "#ffd60a"
+        img_cell:
+          - background-color: "rgba(255, 214, 10, 0.25)"
+    - value: "off"
+      styles:
+        icon:
+          - color: "rgba(235, 235, 245, 0.6)"
+  styles:
+    card:
+      - border-radius: 18px
+      - height: 100px
+      - padding: 14px
+    grid:
+      - grid-template-areas: '"i" "n" "s"'
+      - grid-template-rows: min-content 1fr min-content
+    img_cell:
+      - justify-self: start
+      - background-color: "rgba(255, 255, 255, 0.08)"
+      - border-radius: 50%
+      - width: 36px
+      - height: 36px
+    name:
+      - font-size: 14px
+      - font-weight: "600"
+      - justify-self: start
+    state:
+      - font-size: 12px
+      - color: "rgba(235, 235, 245, 0.6)"
+      - justify-self: start
+      - text-transform: capitalize
+
+# ---------------------------------------------------------------------------
+# quick_action_chip — compact pill button for the Home view's quick-action row.
+#   variables:
+#     var_action:  service to call on tap (e.g. "light.turn_off")
+#     var_target:  optional entity_id / area_id payload
+# ---------------------------------------------------------------------------
+quick_action_chip:
+  template: base
+  show_state: false
+  variables:
+    var_action: ""
+    var_target: ""
+  tap_action:
+    action: call-service
+    service: "[[[ return variables.var_action ]]]"
+    service_data:
+      entity_id: "[[[ return variables.var_target ]]]"
+  styles:
+    card:
+      - border-radius: 22px
+      - height: 44px
+      - padding: 0 14px
+      - background-color: "rgba(255, 255, 255, 0.08)"
+    grid:
+      - grid-template-areas: '"i n"'
+      - grid-template-columns: min-content 1fr
+      - grid-template-rows: 1fr
+      - column-gap: 8px
+    icon:
+      - color: "#0a84ff"
+      - width: 18px
+    name:
+      - font-size: 13px
+      - font-weight: "500"
+      - color: "#ffffff"
+      - justify-self: start
+      - align-self: center
+
+# ---------------------------------------------------------------------------
+# section_header — text label with subtle styling for grouping cards.
+# ---------------------------------------------------------------------------
+section_header:
+  show_icon: false
+  show_state: false
+  show_name: true
+  styles:
+    card:
+      - background: transparent
+      - box-shadow: none
+      - padding: 4px 4px 0 4px
+      - height: 28px
+    name:
+      - color: "rgba(235, 235, 245, 0.6)"
+      - font-size: 13px
+      - font-weight: "600"
+      - text-transform: uppercase
+      - letter-spacing: "0.6px"
+      - justify-self: start

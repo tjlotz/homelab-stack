@@ -1,0 +1,105 @@
+# Air Purifiers view — Levoit units via the VeSync integration.
+# VeSync exposes purifiers as `fan.<name>`. Filter life and air quality
+# typically appear as `sensor.<name>_filter_life` and
+# `sensor.<name>_air_quality`. Replace placeholders once the integration
+# is connected.
+
+title: Air Purifiers
+path: air
+icon: mdi:air-purifier
+type: sections
+max_columns: 2
+sections:
+  # ----------------------------------------------------------- master controls
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Master
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:button-card
+            template: quick_action_chip
+            name: All on
+            icon: mdi:fan
+            tap_action:
+              action: call-service
+              service: fan.turn_on
+              service_data:
+                entity_id:
+                  - fan.bedroom_purifier      # TODO
+                  - fan.living_room_purifier  # TODO
+                  - fan.office_purifier       # TODO
+          - type: custom:button-card
+            template: quick_action_chip
+            name: All off
+            icon: mdi:fan-off
+            tap_action:
+              action: call-service
+              service: fan.turn_off
+              service_data:
+                entity_id:
+                  - fan.bedroom_purifier      # TODO
+                  - fan.living_room_purifier  # TODO
+                  - fan.office_purifier       # TODO
+          - type: custom:button-card
+            template: quick_action_chip
+            name: Auto mode
+            icon: mdi:auto-mode
+            tap_action:
+              action: call-service
+              service: fan.set_preset_mode
+              service_data:
+                entity_id:
+                  - fan.bedroom_purifier      # TODO
+                  - fan.living_room_purifier  # TODO
+                  - fan.office_purifier       # TODO
+                preset_mode: auto
+
+  # ------------------------------------------------------------- per-purifier
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Units
+
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: fan
+              options:
+                type: custom:mushroom-fan-card
+                show_percentage_control: true
+                show_oscillate_control: false
+                collapsible_controls: true
+        sort:
+          method: friendly_name
+
+  # ---------------------------------------------------------------- diagnostics
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Filter life
+
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          state_color: true
+        card_param: entities
+        filter:
+          include:
+            - entity_id: "sensor.*_filter_life*"
+            - entity_id: "sensor.*_air_quality*"
+        sort:
+          method: friendly_name

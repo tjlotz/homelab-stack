@@ -1,0 +1,100 @@
+# Lights view — every Hue light grouped by room with brightness/color sliders.
+# Auto-entities pulls all entities matching domain:light, grouped by their
+# `area_id` attribute (set this in HA → Settings → Areas).
+
+title: Lights
+path: lights
+icon: mdi:lightbulb-group
+type: sections
+max_columns: 2
+sections:
+  # ------------------------------------------------------------ master controls
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Master
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:button-card
+            template: quick_action_chip
+            name: All on
+            icon: mdi:lightbulb-on
+            tap_action:
+              action: call-service
+              service: light.turn_on
+              service_data:
+                entity_id: all
+          - type: custom:button-card
+            template: quick_action_chip
+            name: All off
+            icon: mdi:lightbulb-off
+            tap_action:
+              action: call-service
+              service: light.turn_off
+              service_data:
+                entity_id: all
+          - type: custom:button-card
+            template: quick_action_chip
+            name: Dim 30%
+            icon: mdi:brightness-3
+            tap_action:
+              action: call-service
+              service: light.turn_on
+              service_data:
+                entity_id: all
+                brightness_pct: 30
+
+  # ------------------------------------------------------------- per-room groups
+  # auto-entities pulls every Hue light and groups by area. To make this work:
+  #   - In HA, assign each Hue bulb to an Area (Office / Living Room / etc.)
+  #   - Optionally create a Hue group per room and it'll appear here too.
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: All Lights
+
+      - type: custom:auto-entities
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: light
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: true
+                show_color_temp_control: true
+                collapsible_controls: true
+        sort:
+          method: friendly_name
+
+  # ----------------------------------------------------------------- lights on
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Currently On
+
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: grid
+          columns: 2
+          square: false
+        card_param: cards
+        filter:
+          include:
+            - domain: light
+              state: "on"
+              options:
+                type: custom:mushroom-light-card
+                show_brightness_control: true
+                collapsible_controls: true

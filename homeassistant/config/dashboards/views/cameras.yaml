@@ -1,0 +1,160 @@
+# Cameras view — all 5 Reolinks via the Frigate HACS integration.
+# Camera entity IDs follow the names in frigate/config/config.yml:
+#   doorbell, garage, living_room, office, driveway
+#
+# The Frigate integration creates `camera.<name>` (live stream) plus
+# `binary_sensor.<name>_person`, `<name>_motion`, etc.
+#
+# Closes #8 — driveway camera is included alongside the rest.
+
+title: Cameras
+path: cameras
+icon: mdi:cctv
+type: sections
+max_columns: 2
+sections:
+  # ----------------------------------------------------------- security status
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Security
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Doorbell
+            secondary: "{{ states('binary_sensor.doorbell_person') | replace('on','Person') | replace('off','Clear') }}"
+            icon: mdi:doorbell
+            entity: binary_sensor.doorbell_person
+            icon_color: |
+              {% if is_state('binary_sensor.doorbell_person','on') %}red{% else %}green{% endif %}
+            tap_action:
+              action: navigate
+              navigation_path: "#doorbell"
+          - type: custom:mushroom-template-card
+            primary: Driveway
+            secondary: "{{ states('binary_sensor.driveway_person') | replace('on','Person') | replace('off','Clear') }}"
+            icon: mdi:car
+            entity: binary_sensor.driveway_person
+            icon_color: |
+              {% if is_state('binary_sensor.driveway_person','on') %}red{% else %}green{% endif %}
+            tap_action:
+              action: navigate
+              navigation_path: "#driveway"
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Garage
+            secondary: "{{ states('binary_sensor.garage_person') | replace('on','Person') | replace('off','Clear') }}"
+            icon: mdi:garage
+            entity: binary_sensor.garage_person
+            icon_color: |
+              {% if is_state('binary_sensor.garage_person','on') %}red{% else %}green{% endif %}
+            tap_action:
+              action: navigate
+              navigation_path: "#garage"
+          - type: custom:mushroom-template-card
+            primary: Living Room
+            secondary: "{{ states('binary_sensor.living_room_person') | replace('on','Person') | replace('off','Clear') }}"
+            icon: mdi:sofa
+            entity: binary_sensor.living_room_person
+            icon_color: |
+              {% if is_state('binary_sensor.living_room_person','on') %}red{% else %}green{% endif %}
+            tap_action:
+              action: navigate
+              navigation_path: "#living-room"
+          - type: custom:mushroom-template-card
+            primary: Office
+            secondary: "{{ states('binary_sensor.office_person') | replace('on','Person') | replace('off','Clear') }}"
+            icon: mdi:desk
+            entity: binary_sensor.office_person
+            icon_color: |
+              {% if is_state('binary_sensor.office_person','on') %}red{% else %}green{% endif %}
+            tap_action:
+              action: navigate
+              navigation_path: "#office"
+
+  # --------------------------------------------------------------- live feeds
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Live
+
+      - type: heading
+        heading: Doorbell
+        heading_style: subtitle
+        icon: mdi:doorbell
+      - type: picture-entity
+        entity: camera.doorbell
+        camera_view: live
+        show_state: false
+        show_name: false
+        tap_action:
+          action: more-info
+
+      - type: heading
+        heading: Driveway
+        heading_style: subtitle
+        icon: mdi:car
+      - type: picture-entity
+        entity: camera.driveway
+        camera_view: live
+        show_state: false
+        show_name: false
+        tap_action:
+          action: more-info
+
+      - type: heading
+        heading: Garage
+        heading_style: subtitle
+        icon: mdi:garage
+      - type: picture-entity
+        entity: camera.garage
+        camera_view: live
+        show_state: false
+        show_name: false
+        tap_action:
+          action: more-info
+
+      - type: heading
+        heading: Living Room
+        heading_style: subtitle
+        icon: mdi:sofa
+      - type: picture-entity
+        entity: camera.living_room
+        camera_view: live
+        show_state: false
+        show_name: false
+        tap_action:
+          action: more-info
+
+      - type: heading
+        heading: Office
+        heading_style: subtitle
+        icon: mdi:desk
+      - type: picture-entity
+        entity: camera.office
+        camera_view: live
+        show_state: false
+        show_name: false
+        tap_action:
+          action: more-info
+
+  # ---------------------------------------------------------------- recent events
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Recent events
+
+      # Frigate HACS integration ships its own card for browsing events.
+      # If the user prefers, this can be swapped for `frigate-card`.
+      - type: iframe
+        url: /api/frigate/notifications/events
+        aspect_ratio: 75%

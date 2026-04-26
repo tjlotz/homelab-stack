@@ -1,0 +1,71 @@
+# iOS-inspired theme for the Home dashboard.
+# Loaded by frontend.themes in configuration.yaml.
+# Apply via: profile menu → Theme → "iOS Hub".
+
+iOS Hub:
+  # Base palette — near-black background, white text, subtle translucent surfaces.
+  primary-color: "#0a84ff"           # iOS system blue
+  accent-color: "#0a84ff"
+
+  primary-background-color: "#0d0f12"
+  secondary-background-color: "#15181d"
+  card-background-color: "rgba(28, 30, 35, 0.85)"
+  ha-card-background: "rgba(28, 30, 35, 0.85)"
+  ha-card-border-radius: "18px"
+  ha-card-border-width: "0"
+  ha-card-box-shadow: "0 4px 18px rgba(0, 0, 0, 0.35)"
+
+  primary-text-color: "#ffffff"
+  secondary-text-color: "rgba(235, 235, 245, 0.6)"
+  text-primary-color: "#ffffff"
+  disabled-text-color: "rgba(235, 235, 245, 0.3)"
+
+  # Sidebar / app-header
+  app-header-background-color: "transparent"
+  app-header-text-color: "#ffffff"
+  sidebar-background-color: "#0d0f12"
+  sidebar-text-color: "#ffffff"
+  sidebar-selected-text-color: "#0a84ff"
+  sidebar-selected-icon-color: "#0a84ff"
+  sidebar-icon-color: "rgba(235, 235, 245, 0.6)"
+
+  # State colors — used by mushroom + bubble cards
+  state-icon-color: "#ffffff"
+  state-icon-active-color: "#0a84ff"
+  paper-item-icon-color: "rgba(235, 235, 245, 0.6)"
+  paper-item-icon-active-color: "#ffd60a"
+
+  # Status badges (used by the room_card temperature pill)
+  label-badge-background-color: "rgba(28, 30, 35, 0.85)"
+  label-badge-text-color: "#ffffff"
+  label-badge-blue: "#0a84ff"
+  label-badge-green: "#30d158"
+  label-badge-red: "#ff453a"
+  label-badge-yellow: "#ffd60a"
+
+  # Sliders (lights brightness / fan speed)
+  paper-slider-active-color: "#ffd60a"
+  paper-slider-knob-color: "#ffd60a"
+  paper-slider-knob-start-color: "#ffd60a"
+  paper-slider-pin-color: "#ffd60a"
+  paper-slider-secondary-color: "rgba(235, 235, 245, 0.2)"
+  paper-slider-container-color: "rgba(235, 235, 245, 0.1)"
+
+  # Mushroom card-specific tokens
+  mush-rgb-card: "28, 30, 35"
+  mush-card-primary-font-size: "15px"
+  mush-card-secondary-font-size: "13px"
+  mush-icon-border-radius: "50%"
+  mush-control-border-radius: "16px"
+  mush-control-height: "42px"
+  mush-control-spacing: "12px"
+  mush-rgb-state-light: "255, 214, 10"
+  mush-rgb-state-fan: "10, 132, 255"
+  mush-rgb-state-cover: "10, 132, 255"
+  mush-rgb-state-switch: "48, 209, 88"
+
+  # Bubble-card tokens
+  bubble-main-background-color: "rgba(28, 30, 35, 0.85)"
+  bubble-secondary-background-color: "rgba(44, 46, 51, 0.85)"
+  bubble-accent-color: "#0a84ff"
+  bubble-border-radius: "18px"

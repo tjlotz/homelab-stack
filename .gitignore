@@ -3,11 +3,30 @@
 
 # Persistent service data (created by setup.sh, managed by Docker)
 plex/config/
-homeassistant/config/
 pihole/etc-pihole/
 pihole/etc-dnsmasq.d/
 mosquitto/data/
 mosquitto/log/
+
+# Home Assistant — track dashboard/theme/config sources, ignore state & secrets
+homeassistant/config/.storage/
+homeassistant/config/.cloud/
+homeassistant/config/deps/
+homeassistant/config/tts/
+homeassistant/config/image/
+homeassistant/config/blueprints/
+homeassistant/config/custom_components/
+homeassistant/config/www/community/
+homeassistant/config/secrets.yaml
+homeassistant/config/known_devices.yaml
+homeassistant/config/ip_bans.yaml
+homeassistant/config/*.db
+homeassistant/config/*.db-*
+homeassistant/config/*.log
+homeassistant/config/*.log.*
+homeassistant/config/home-assistant_v2.*
+homeassistant/config/.HA_VERSION
+homeassistant/config/.uuid
 
 # OS
 .DS_Store

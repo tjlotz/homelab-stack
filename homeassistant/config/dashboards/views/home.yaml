@@ -1,0 +1,186 @@
+# Home view — primary landing surface.
+# Header (clock + weather) → quick-action chips → room tiles → category nav.
+#
+# Entity IDs marked `# TODO:` are placeholders. See ENTITIES.md for the
+# inventory checklist; replace once the corresponding integration is set up.
+
+title: Home
+path: home
+icon: mdi:home-variant
+type: sections
+max_columns: 2
+sections:
+  # ------------------------------------------------------------------ header
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:clock-weather-card
+        entity: weather.home  # TODO: replace with the actual weather.* entity (e.g. weather.forecast_home from Met.no)
+        title: ""
+        sun_entity: sun.sun
+        weather_icon_type: line
+        forecast_rows: 0
+        time_format: 12
+        date_pattern: "EEEE, MMMM d"
+        locale: en-US
+        hide_today_section: false
+        hide_forecast_section: true
+
+  # --------------------------------------------------------- quick actions
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Quick actions
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:button-card
+            template: quick_action_chip
+            name: All lights off
+            icon: mdi:lightbulb-off
+            variables:
+              var_action: light.turn_off
+              var_target: all
+          - type: custom:button-card
+            template: quick_action_chip
+            name: Movie mode
+            icon: mdi:movie-open
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.movie_mode  # TODO: create this scene
+          - type: custom:button-card
+            template: quick_action_chip
+            name: Good night
+            icon: mdi:weather-night
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+              service_data:
+                entity_id: scene.good_night  # TODO: create this scene
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:button-card
+            template: quick_action_chip
+            name: Purify all
+            icon: mdi:air-purifier
+            tap_action:
+              action: call-service
+              service: fan.turn_on
+              service_data:
+                entity_id:
+                  - fan.bedroom_purifier   # TODO: real Levoit entity_ids
+                  - fan.living_room_purifier
+                  - fan.office_purifier
+          - type: custom:button-card
+            template: quick_action_chip
+            name: Cameras
+            icon: mdi:cctv
+            tap_action:
+              action: navigate
+              navigation_path: /ios-hub/cameras
+          - type: custom:button-card
+            template: quick_action_chip
+            name: All off
+            icon: mdi:power
+            tap_action:
+              action: call-service
+              service: homeassistant.turn_off
+              service_data:
+                entity_id: all
+
+  # ------------------------------------------------------------------ rooms
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Rooms
+
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr))
+          grid-gap: 12px
+          mediaquery:
+            "(max-width: 600px)":
+              grid-template-columns: repeat(2, 1fr)
+        cards:
+          - type: custom:button-card
+            template: room_tile
+            variables:
+              var_name: Office
+              var_icon: mdi:desk
+              var_path: /ios-hub/rooms#office
+              var_temp: sensor.office_temperature  # TODO
+          - type: custom:button-card
+            template: room_tile
+            variables:
+              var_name: Living Room
+              var_icon: mdi:sofa
+              var_path: /ios-hub/rooms#living-room
+              var_temp: sensor.living_room_temperature  # TODO
+          - type: custom:button-card
+            template: room_tile
+            variables:
+              var_name: Bedroom
+              var_icon: mdi:bed
+              var_path: /ios-hub/rooms#bedroom
+              var_temp: sensor.bedroom_temperature  # TODO
+          - type: custom:button-card
+            template: room_tile
+            variables:
+              var_name: Garage
+              var_icon: mdi:garage
+              var_path: /ios-hub/rooms#garage
+              var_temp: sensor.garage_temperature  # TODO
+          - type: custom:button-card
+            template: room_tile
+            variables:
+              var_name: Outdoors
+              var_icon: mdi:tree
+              var_path: /ios-hub/rooms#outdoors
+              var_temp: sensor.outdoor_temperature  # TODO
+
+  # -------------------------------------------------------- category nav
+  - type: grid
+    column_span: 2
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Categories
+
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr))
+          grid-gap: 12px
+        cards:
+          - type: custom:button-card
+            template: room_tile
+            variables:
+              var_name: Lights
+              var_icon: mdi:lightbulb-group
+              var_path: /ios-hub/lights
+          - type: custom:button-card
+            template: room_tile
+            variables:
+              var_name: Cameras
+              var_icon: mdi:cctv
+              var_path: /ios-hub/cameras
+          - type: custom:button-card
+            template: room_tile
+            variables:
+              var_name: Air Purifiers
+              var_icon: mdi:air-purifier
+              var_path: /ios-hub/air
+          - type: custom:button-card
+            template: room_tile
+            variables:
+              var_name: Switches & Plugs
+              var_icon: mdi:power-socket-us
+              var_path: /ios-hub/switches

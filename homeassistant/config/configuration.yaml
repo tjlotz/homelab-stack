@@ -1,0 +1,26 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+# Enable built-in go2rtc for RTSP restreaming
+go2rtc:
+
+# YAML-mode dashboards. The default UI dashboard remains UI-managed; the
+# iOS Hub dashboard is sourced from dashboards/ios-hub.yaml so it can be
+# version-controlled in this repo.
+lovelace:
+  mode: storage
+  dashboards:
+    ios-hub:
+      mode: yaml
+      title: Home
+      icon: mdi:home-variant
+      show_in_sidebar: true
+      filename: dashboards/ios-hub.yaml

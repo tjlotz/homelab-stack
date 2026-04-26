@@ -1,0 +1,157 @@
+# Rooms view — one section per physical room.
+# Each section anchored so Home view tiles can deep-link via #<room>.
+# Replace placeholder entity IDs with real ones from ENTITIES.md.
+
+title: Rooms
+path: rooms
+icon: mdi:floor-plan
+type: sections
+max_columns: 2
+sections:
+  # ------------------------------------------------------------------- office
+  - type: grid
+    column_span: 1
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Office
+
+      - type: custom:mushroom-light-card
+        entity: light.office  # TODO: real Hue group/light entity
+        name: Office lights
+        show_brightness_control: true
+        show_color_temp_control: true
+        collapsible_controls: true
+        layout: default
+
+      - type: custom:mushroom-fan-card
+        entity: fan.office_purifier  # TODO: Levoit office unit
+        name: Office purifier
+        show_percentage_control: true
+        show_oscillate_control: false
+        collapsible_controls: true
+
+      - type: custom:mushroom-entity-card
+        entity: switch.office_plug  # TODO: Linkind/iHome desk plug
+        name: Desk plug
+        icon: mdi:power-socket-us
+
+      - type: custom:mushroom-template-card
+        primary: Office camera
+        secondary: "{{ states('binary_sensor.office_person') | replace('on','Person detected') | replace('off','Clear') }}"
+        icon: mdi:cctv
+        entity: camera.office
+        tap_action:
+          action: more-info
+
+  # -------------------------------------------------------------- living room
+  - type: grid
+    column_span: 1
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Living Room
+
+      - type: custom:mushroom-light-card
+        entity: light.living_room  # TODO
+        name: Living room lights
+        show_brightness_control: true
+        show_color_temp_control: true
+        collapsible_controls: true
+
+      - type: custom:mushroom-fan-card
+        entity: fan.living_room_purifier  # TODO
+        name: Living room purifier
+        show_percentage_control: true
+        collapsible_controls: true
+
+      - type: custom:mushroom-entity-card
+        entity: switch.living_room_lamp  # TODO
+        name: Lamp
+        icon: mdi:floor-lamp
+
+      - type: custom:mushroom-template-card
+        primary: Living room camera
+        secondary: "{{ states('binary_sensor.living_room_person') | replace('on','Person detected') | replace('off','Clear') }}"
+        icon: mdi:cctv
+        entity: camera.living_room
+        tap_action:
+          action: more-info
+
+  # ----------------------------------------------------------------- bedroom
+  - type: grid
+    column_span: 1
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Bedroom
+
+      - type: custom:mushroom-light-card
+        entity: light.bedroom  # TODO
+        name: Bedroom lights
+        show_brightness_control: true
+        show_color_temp_control: true
+        collapsible_controls: true
+
+      - type: custom:mushroom-fan-card
+        entity: fan.bedroom_purifier  # TODO
+        name: Bedroom purifier
+        show_percentage_control: true
+        collapsible_controls: true
+
+      - type: custom:mushroom-entity-card
+        entity: switch.bedroom_plug  # TODO
+        name: Nightstand plug
+        icon: mdi:power-socket-us
+
+  # ------------------------------------------------------------------ garage
+  - type: grid
+    column_span: 1
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Garage
+
+      - type: custom:mushroom-light-card
+        entity: light.garage  # TODO (if any Hue here)
+        name: Garage lights
+        show_brightness_control: true
+        collapsible_controls: true
+
+      - type: custom:mushroom-template-card
+        primary: Garage camera
+        secondary: "{{ states('binary_sensor.garage_person') | replace('on','Person detected') | replace('off','Clear') }}"
+        icon: mdi:cctv
+        entity: camera.garage
+        tap_action:
+          action: more-info
+
+  # ---------------------------------------------------------------- outdoors
+  - type: grid
+    column_span: 1
+    cards:
+      - type: custom:button-card
+        template: section_header
+        name: Outdoors
+
+      - type: custom:mushroom-template-card
+        primary: Doorbell
+        secondary: "{{ states('binary_sensor.doorbell_person') | replace('on','Person at door') | replace('off','Clear') }}"
+        icon: mdi:doorbell
+        entity: camera.doorbell
+        tap_action:
+          action: more-info
+
+      - type: custom:mushroom-template-card
+        primary: Driveway
+        secondary: "{{ states('binary_sensor.driveway_person') | replace('on','Person detected') | replace('off','Clear') }}"
+        icon: mdi:cctv
+        entity: camera.driveway
+        tap_action:
+          action: more-info
+
+      - type: weather-forecast
+        entity: weather.home  # TODO
+        forecast_type: daily
+        show_current: true
+        show_forecast: true

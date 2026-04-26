@@ -1,0 +1,20 @@
+# Top-level definition for the iOS Hub dashboard.
+#
+# Loaded by `lovelace.dashboards.ios-hub.filename` in configuration.yaml.
+# Splits views and templates into smaller files under dashboards/.
+#
+# Edit views in dashboards/views/, shared button-card templates in
+# dashboards/templates/button_card.yaml.
+
+title: Home
+theme: iOS Hub
+
+button_card_templates: !include templates/button_card.yaml
+
+views:
+  - !include views/home.yaml
+  - !include views/rooms.yaml
+  - !include views/lights.yaml
+  - !include views/cameras.yaml
+  - !include views/air.yaml
+  - !include views/switches.yaml
