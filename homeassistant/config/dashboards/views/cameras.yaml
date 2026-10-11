@@ -5,8 +5,8 @@
 # The Frigate integration creates `camera.<name>` (live stream) plus
 # `binary_sensor.<name>_person`, `<name>_motion`, etc.
 #
-# PTZ controls for E1 Pro cameras (garage, living_room, office) via Reolink integration.
-# Reolink integration creates `camera.reolink_<name>` entities and PTZ services.
+# PTZ controls for E1 Pro cameras (garage, living_room, office) via direct Reolink API.
+# Incremental pan/tilt/zoom movements using PTZ preset commands.
 #
 # Closes #8 — driveway camera is included alongside the rest.
 
@@ -139,60 +139,36 @@ sections:
             columns: 3
             square: true
             cards:
-              - type: custom:button-card
-                entity: button.garage_e1_pro_ptz_up
-                icon: mdi:arrow-up
+              - type: button
+                name: ↑
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.garage_e1_pro
-                    pan_tilt_step: up
-              - type: custom:button-card
-                entity: button.garage_e1_pro_ptz_home
-                icon: mdi:home
+                  service: rest_command.garage_ptz_up
+              - type: button
+                name: Home
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.garage_e1_pro
-                    pan_tilt_step: home
-              - type: custom:button-card
-                entity: button.garage_e1_pro_ptz_down
-                icon: mdi:arrow-down
+                  service: rest_command.garage_ptz_home
+              - type: button
+                name: ↓
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.garage_e1_pro
-                    pan_tilt_step: down
-              - type: custom:button-card
-                entity: button.garage_e1_pro_ptz_left
-                icon: mdi:arrow-left
+                  service: rest_command.garage_ptz_down
+              - type: button
+                name: ←
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.garage_e1_pro
-                    pan_tilt_step: left
-              - type: custom:button-card
-                entity: button.garage_e1_pro_ptz_zoom_in
-                icon: mdi:magnify-plus
+                  service: rest_command.garage_ptz_left
+              - type: button
+                name: 🔍+
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.garage_e1_pro
-                    zoom_step: in
-              - type: custom:button-card
-                entity: button.garage_e1_pro_ptz_right
-                icon: mdi:arrow-right
+                  service: rest_command.garage_ptz_zoom_in
+              - type: button
+                name: →
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.garage_e1_pro
-                    pan_tilt_step: right
+                  service: rest_command.garage_ptz_right
 
       # Living Room with PTZ controls
       - type: grid
@@ -213,60 +189,36 @@ sections:
             columns: 3
             square: true
             cards:
-              - type: custom:button-card
-                entity: button.living_room_e1_pro_ptz_up
-                icon: mdi:arrow-up
+              - type: button
+                name: ↑
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.living_room_e1_pro
-                    pan_tilt_step: up
-              - type: custom:button-card
-                entity: button.living_room_e1_pro_ptz_home
-                icon: mdi:home
+                  service: rest_command.living_room_ptz_up
+              - type: button
+                name: Home
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.living_room_e1_pro
-                    pan_tilt_step: home
-              - type: custom:button-card
-                entity: button.living_room_e1_pro_ptz_down
-                icon: mdi:arrow-down
+                  service: rest_command.living_room_ptz_home
+              - type: button
+                name: ↓
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.living_room_e1_pro
-                    pan_tilt_step: down
-              - type: custom:button-card
-                entity: button.living_room_e1_pro_ptz_left
-                icon: mdi:arrow-left
+                  service: rest_command.living_room_ptz_down
+              - type: button
+                name: ←
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.living_room_e1_pro
-                    pan_tilt_step: left
-              - type: custom:button-card
-                entity: button.living_room_e1_pro_ptz_zoom_in
-                icon: mdi:magnify-plus
+                  service: rest_command.living_room_ptz_left
+              - type: button
+                name: 🔍+
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.living_room_e1_pro
-                    zoom_step: in
-              - type: custom:button-card
-                entity: button.living_room_e1_pro_ptz_right
-                icon: mdi:arrow-right
+                  service: rest_command.living_room_ptz_zoom_in
+              - type: button
+                name: →
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.living_room_e1_pro
-                    pan_tilt_step: right
+                  service: rest_command.living_room_ptz_right
 
       # Office with PTZ controls
       - type: grid
@@ -287,60 +239,36 @@ sections:
             columns: 3
             square: true
             cards:
-              - type: custom:button-card
-                entity: button.office_e1_pro_ptz_up
-                icon: mdi:arrow-up
+              - type: button
+                name: ↑
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.office_e1_pro
-                    pan_tilt_step: up
-              - type: custom:button-card
-                entity: button.office_e1_pro_ptz_home
-                icon: mdi:home
+                  service: rest_command.office_ptz_up
+              - type: button
+                name: Home
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.office_e1_pro
-                    pan_tilt_step: home
-              - type: custom:button-card
-                entity: button.office_e1_pro_ptz_down
-                icon: mdi:arrow-down
+                  service: rest_command.office_ptz_home
+              - type: button
+                name: ↓
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.office_e1_pro
-                    pan_tilt_step: down
-              - type: custom:button-card
-                entity: button.office_e1_pro_ptz_left
-                icon: mdi:arrow-left
+                  service: rest_command.office_ptz_down
+              - type: button
+                name: ←
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.office_e1_pro
-                    pan_tilt_step: left
-              - type: custom:button-card
-                entity: button.office_e1_pro_ptz_zoom_in
-                icon: mdi:magnify-plus
+                  service: rest_command.office_ptz_left
+              - type: button
+                name: 🔍+
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.office_e1_pro
-                    zoom_step: in
-              - type: custom:button-card
-                entity: button.office_e1_pro_ptz_right
-                icon: mdi:arrow-right
+                  service: rest_command.office_ptz_zoom_in
+              - type: button
+                name: →
                 tap_action:
                   action: call-service
-                  service: camera.ptz
-                  service_data:
-                    entity_id: camera.office_e1_pro
-                    pan_tilt_step: right
+                  service: rest_command.office_ptz_right
 
   # ---------------------------------------------------------------- recent events
   - type: grid
