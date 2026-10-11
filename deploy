@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# BLACKBOX — Local Deployment Wrapper
+# Run from your local machine to deploy the latest release branch to Blackbox
+# Usage: ./deploy [--dry-run]
+# ==============================================================================
+
+set -euo pipefail
+
+BLACKBOX_HOST="192.168.1.2"
+BLACKBOX_USER="root"
+BLACKBOX_DEPLOY_SCRIPT="/opt/homelab-stack/deploy.sh"
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# --- Functions ---
+
+log() {
+  echo "$(tput setaf 4)→$(tput sgr0) $*"
+}
+
+log_success() {
+  echo "$(tput setaf 2)✓$(tput sgr0) $*"
+}
+
+log_error() {
+  echo "$(tput setaf 1)✗$(tput sgr0) $*" >&2
+}
+
+log_info() {
+  echo "$(tput setaf 6)ℹ$(tput sgr0) $*"
+}
+
+# --- Main ---
+
+log "BLACKBOX Deployment"
+echo ""
+
+# Check if on release branch
+if [[ "$CURRENT_BRANCH" != "release" ]]; then
+  log_info "Current branch: $CURRENT_BRANCH"
+  log_error "You must be on the 'release' branch to deploy"
+  echo ""
+  echo "To deploy:"
+  echo "  1. Commit your changes to 'develop'"
+  echo "  2. Merge develop into release: git merge develop"
+  echo "  3. Push to GitHub: git push origin release"
+  echo "  4. Run this script again"
+  exit 1
+fi
+
+# Check if working tree is clean
+if ! git diff-index --quiet HEAD --; then
+  log_error "Working tree has uncommitted changes"
+  echo ""
+  echo "Commit or stash your changes before deploying"
+  exit 1
+fi
+
+# Check if we're up to date with remote
+git fetch origin release
+if ! git diff --quiet HEAD origin/release; then
+  log_error "Your local 'release' branch is behind origin/release"
+  echo ""
+  echo "Pull the latest changes: git pull origin release"
+  exit 1
+fi
+
+# Show what will be deployed
+CURRENT_COMMIT=$(git rev-parse --short HEAD)
+CURRENT_MESSAGE=$(git log -1 --format=%s)
+
+log "Deploying to Blackbox ($BLACKBOX_HOST)"
+log_info "Branch: $CURRENT_BRANCH"
+log_info "Commit: $CURRENT_COMMIT - $CURRENT_MESSAGE"
+echo ""
+
+# Run deployment script on Blackbox
+log "Running deployment on Blackbox..."
+echo ""
+
+if ssh "$BLACKBOX_USER@$BLACKBOX_HOST" "$BLACKBOX_DEPLOY_SCRIPT"; then
+  echo ""
+  log_success "Deployment completed successfully!"
+  echo ""
+  echo "Services deployed to:"
+  echo "  Home Assistant: http://192.168.1.2:8123"
+  echo "  Frigate:        http://192.168.1.2:5000"
+  echo "  Pi-hole:        http://192.168.1.2:8080"
+  echo "  Plex:           http://192.168.1.2:32400"
+else
+  echo ""
+  log_error "Deployment failed"
+  echo ""
+  echo "Check the logs on Blackbox:"
+  echo "  ssh root@192.168.1.2 'tail -50 /var/log/homelab-deploy.log'"
+  exit 1
+fi
+
+echo ""

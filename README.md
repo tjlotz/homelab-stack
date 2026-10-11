@@ -317,6 +317,73 @@ homelab-stack/
 
 6. In the HA UI, configure the MQTT and Frigate integrations (see Home Assistant Setup above).
 
+## Development & Deployment Workflow
+
+This repository uses a branching strategy for easy local development and remote deployment:
+
+### Branch Structure
+
+- **`develop`** — Work-in-progress branch for new features and changes. Used locally for testing.
+- **`release`** — Stable branch that reflects what's running on Blackbox. Pushed to trigger deployments.
+- **`main`** — Archive/archive branch. Not actively used for deployments.
+
+### Local Development
+
+1. Create a feature branch from `develop`:
+   ```bash
+   git checkout develop
+   git checkout -b feature/my-feature
+   ```
+
+2. Make your changes and commit:
+   ```bash
+   git commit -m "feat: add my new feature"
+   ```
+
+3. Push to `develop` for testing:
+   ```bash
+   git push origin feature/my-feature
+   git checkout develop && git merge feature/my-feature && git push origin develop
+   ```
+
+### Deploying to Blackbox
+
+When you're ready to deploy to Blackbox:
+
+1. Merge your changes into the `release` branch:
+   ```bash
+   git checkout release
+   git merge develop
+   git push origin release
+   ```
+
+2. Run the deployment script (from your local machine):
+   ```bash
+   ./deploy
+   ```
+
+   This script will:
+   - Verify you're on the `release` branch
+   - Ensure your working tree is clean
+   - SSH into Blackbox and pull the latest `release` branch code
+   - Detect which service configs have changed (Home Assistant, Frigate, Mosquitto, etc.)
+   - Restart or reload only the affected services
+   - Log all changes to `/var/log/homelab-deploy.log`
+
+3. Verify the deployment succeeded by checking the service URLs (see [Accessing Services](#accessing-services) below).
+
+### Troubleshooting Deployments
+
+If a deployment fails:
+
+```bash
+# View deployment logs on Blackbox
+ssh root@192.168.1.2 tail -50 /var/log/homelab-deploy.log
+
+# Manually run the deployment script on Blackbox
+ssh root@192.168.1.2 /opt/homelab-stack/deploy.sh
+```
+
 ### Accessing Services
 
 | Service | URL |
