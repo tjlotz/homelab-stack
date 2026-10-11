@@ -36,7 +36,8 @@ while [[ $ELAPSED -lt $TIMEOUT ]]; do
   
   if [[ "$ALL_READY" == true ]]; then
     log "✓ All NAS mounts are ready!"
-    exit 0
+    # Execute the Plex init process to replace this shell
+    exec /init
   fi
   
   sleep 5

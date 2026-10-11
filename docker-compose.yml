@@ -14,7 +14,7 @@ services:
       - /mnt/Public/Media/Movies:/media/Movies
       - /mnt/Public/Media/TV Shows:/media/TV Shows
     # Wait for NAS mounts before starting (prevents unavailability issues)
-    command: /bin/sh -c '/scripts/wait-for-mounts.sh && exec /init'
+    entrypoint: /scripts/wait-for-mounts.sh
     restart: unless-stopped
 
   homeassistant:
