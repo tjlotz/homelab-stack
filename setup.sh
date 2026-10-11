@@ -181,6 +181,26 @@ else
   echo "  Then approve the subnet route + disable key expiry in the Tailscale admin console."
 fi
 
+# --- Configure DNS to support both Tailscale and public internet ---
+
+echo ""
+echo "[6.5/9] Configuring DNS for Tailscale + public internet access..."
+
+# Configure systemd-resolved to use public DNS with Tailscale as a fallback
+# This allows containers to resolve public domains (plex.tv, etc) while maintaining
+# Tailscale connectivity for tailnet-internal domains.
+cat > /etc/systemd/resolved.conf <<'EOF'
+[Resolve]
+DNS=8.8.8.8 8.8.4.4 100.100.100.100
+FallbackDNS=8.8.8.8 8.8.4.4
+# Route Tailscale domains (.ts.net) to Tailscale's nameserver
+Domains=~tail*.ts.net
+DNSSEC=no
+EOF
+
+systemctl restart systemd-resolved || true
+echo "  Configured systemd-resolved to use public DNS (8.8.8.8, 8.8.4.4) with Tailscale fallback"
+
 # --- Install MOTD ---
 
 echo ""
