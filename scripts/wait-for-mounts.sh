@@ -10,7 +10,6 @@ set -euo pipefail
 REQUIRED_MOUNTS=(
   "/mnt/Public/Media/Movies"
   "/mnt/Public/Media/TV Shows"
-  "/mnt/Cameras"
 )
 
 TIMEOUT=300  # 5 minutes
@@ -26,7 +25,9 @@ while [[ $ELAPSED -lt $TIMEOUT ]]; do
   ALL_MOUNTED=true
   
   for mount in "${REQUIRED_MOUNTS[@]}"; do
-    if ! mountpoint -q "$mount" 2>/dev/null; then
+    # Check if directory exists and is readable (not just a mountpoint check)
+    # Inside container, volumes appear as regular directories, not mountpoints
+    if ! [[ -d "$mount" ]] || ! [[ -r "$mount" ]]; then
       log "  ⏳ Waiting for: $mount"
       ALL_MOUNTED=false
       break
@@ -45,7 +46,7 @@ done
 log "✗ Timeout waiting for NAS mounts (${TIMEOUT}s elapsed)"
 log "The following mounts may not be accessible:"
 for mount in "${REQUIRED_MOUNTS[@]}"; do
-  if ! mountpoint -q "$mount" 2>/dev/null; then
+  if ! [[ -d "$mount" ]] || ! [[ -r "$mount" ]]; then
     log "  - $mount"
   fi
 done
