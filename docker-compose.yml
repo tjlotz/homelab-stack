@@ -10,8 +10,11 @@ services:
       - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
       - ./plex/config:/config
+      - ./scripts:/scripts:ro
       - /mnt/Public/Media/Movies:/media/Movies
       - /mnt/Public/Media/TV Shows:/media/TV Shows
+    # Wait for NAS mounts before starting (prevents unavailability issues)
+    command: /bin/sh -c '/scripts/wait-for-mounts.sh && exec /init'
     restart: unless-stopped
 
   homeassistant:
