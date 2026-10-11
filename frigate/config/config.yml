@@ -36,23 +36,25 @@ objects:
     - cat
     - dog
 
-# Retention: 4-day rolling window for event recordings + snapshots.
-# Cleanup runs daily, so footage age oscillates between 72h (just after cleanup)
-# and 96h (just before next cleanup), satisfying the "store ~72h, delete on day 4" spec.
+# Retention Strategy:
+# - Continuous recording: 3 days (covers most incidents, ~450 GB)
+# - Event clips: 7 days (high-quality clips from detections)
+# - Snapshots: 7 days (thumbnails for quick scanning)
+# Cleanup runs daily at 2 AM UTC.
 record:
   enabled: true
   retain:
-    days: 0
+    days: 3
     mode: all
   events:
     retain:
-      default: 4
+      default: 7
       mode: active_objects
 
 snapshots:
   enabled: true
   retain:
-    default: 4
+    default: 7
 
 # Centralize RTSP connections through Frigate's bundled go2rtc.
 # This gives a single connection per camera (vs one per role) and exposes
