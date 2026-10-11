@@ -9,6 +9,17 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
+# Reolink camera integration for PTZ controls
+# Provides camera entities and PTZ controls for E1 Pro cameras
+reolink:
+  host:
+    - name: Garage E1 Pro
+      host: 192.168.1.11
+    - name: Living Room E1 Pro
+      host: 192.168.1.12
+    - name: Office E1 Pro
+      host: 192.168.1.13
+
 # Enable built-in go2rtc for RTSP restreaming
 go2rtc:
 

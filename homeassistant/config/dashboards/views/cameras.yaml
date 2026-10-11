@@ -5,21 +5,24 @@
 # The Frigate integration creates `camera.<name>` (live stream) plus
 # `binary_sensor.<name>_person`, `<name>_motion`, etc.
 #
+# PTZ controls for E1 Pro cameras (garage, living_room, office) via Reolink integration.
+# Reolink integration creates `camera.reolink_<name>` entities and PTZ services.
+#
 # Closes #8 — driveway camera is included alongside the rest.
 
 title: Cameras
 path: cameras
 icon: mdi:cctv
 type: sections
-max_columns: 2
+max_columns: 1
 sections:
   # ----------------------------------------------------------- security status
   - type: grid
-    column_span: 2
+    column_span: 1
     cards:
       - type: custom:button-card
         template: section_header
-        name: Security
+        name: Security Status
 
       - type: horizontal-stack
         cards:
@@ -79,79 +82,273 @@ sections:
 
   # --------------------------------------------------------------- live feeds
   - type: grid
-    column_span: 2
+    column_span: 1
     cards:
       - type: custom:button-card
         template: section_header
-        name: Live
+        name: Live Feeds
 
-      - type: heading
-        heading: Doorbell
-        heading_style: subtitle
-        icon: mdi:doorbell
-      - type: picture-entity
-        entity: camera.doorbell
-        camera_view: live
-        show_state: false
-        show_name: false
-        tap_action:
-          action: more-info
+      # Doorbell (no PTZ)
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            heading: Doorbell
+            heading_style: subtitle
+            icon: mdi:doorbell
+          - type: picture-entity
+            entity: camera.doorbell
+            camera_view: live
+            show_state: false
+            show_name: false
+            tap_action:
+              action: more-info
 
-      - type: heading
-        heading: Driveway
-        heading_style: subtitle
-        icon: mdi:car
-      - type: picture-entity
-        entity: camera.driveway
-        camera_view: live
-        show_state: false
-        show_name: false
-        tap_action:
-          action: more-info
+      # Driveway (no PTZ)
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            heading: Driveway
+            heading_style: subtitle
+            icon: mdi:car
+          - type: picture-entity
+            entity: camera.driveway
+            camera_view: live
+            show_state: false
+            show_name: false
+            tap_action:
+              action: more-info
 
-      - type: heading
-        heading: Garage
-        heading_style: subtitle
-        icon: mdi:garage
-      - type: picture-entity
-        entity: camera.garage
-        camera_view: live
-        show_state: false
-        show_name: false
-        tap_action:
-          action: more-info
+      # Garage with PTZ controls
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            heading: Garage
+            heading_style: subtitle
+            icon: mdi:garage
+          - type: picture-entity
+            entity: camera.garage
+            camera_view: live
+            show_state: false
+            show_name: false
+            tap_action:
+              action: more-info
+          - type: grid
+            columns: 3
+            square: true
+            cards:
+              - type: custom:button-card
+                entity: button.garage_e1_pro_ptz_up
+                icon: mdi:arrow-up
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.garage_e1_pro
+                    pan_tilt_step: up
+              - type: custom:button-card
+                entity: button.garage_e1_pro_ptz_home
+                icon: mdi:home
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.garage_e1_pro
+                    pan_tilt_step: home
+              - type: custom:button-card
+                entity: button.garage_e1_pro_ptz_down
+                icon: mdi:arrow-down
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.garage_e1_pro
+                    pan_tilt_step: down
+              - type: custom:button-card
+                entity: button.garage_e1_pro_ptz_left
+                icon: mdi:arrow-left
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.garage_e1_pro
+                    pan_tilt_step: left
+              - type: custom:button-card
+                entity: button.garage_e1_pro_ptz_zoom_in
+                icon: mdi:magnify-plus
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.garage_e1_pro
+                    zoom_step: in
+              - type: custom:button-card
+                entity: button.garage_e1_pro_ptz_right
+                icon: mdi:arrow-right
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.garage_e1_pro
+                    pan_tilt_step: right
 
-      - type: heading
-        heading: Living Room
-        heading_style: subtitle
-        icon: mdi:sofa
-      - type: picture-entity
-        entity: camera.living_room
-        camera_view: live
-        show_state: false
-        show_name: false
-        tap_action:
-          action: more-info
+      # Living Room with PTZ controls
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            heading: Living Room
+            heading_style: subtitle
+            icon: mdi:sofa
+          - type: picture-entity
+            entity: camera.living_room
+            camera_view: live
+            show_state: false
+            show_name: false
+            tap_action:
+              action: more-info
+          - type: grid
+            columns: 3
+            square: true
+            cards:
+              - type: custom:button-card
+                entity: button.living_room_e1_pro_ptz_up
+                icon: mdi:arrow-up
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.living_room_e1_pro
+                    pan_tilt_step: up
+              - type: custom:button-card
+                entity: button.living_room_e1_pro_ptz_home
+                icon: mdi:home
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.living_room_e1_pro
+                    pan_tilt_step: home
+              - type: custom:button-card
+                entity: button.living_room_e1_pro_ptz_down
+                icon: mdi:arrow-down
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.living_room_e1_pro
+                    pan_tilt_step: down
+              - type: custom:button-card
+                entity: button.living_room_e1_pro_ptz_left
+                icon: mdi:arrow-left
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.living_room_e1_pro
+                    pan_tilt_step: left
+              - type: custom:button-card
+                entity: button.living_room_e1_pro_ptz_zoom_in
+                icon: mdi:magnify-plus
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.living_room_e1_pro
+                    zoom_step: in
+              - type: custom:button-card
+                entity: button.living_room_e1_pro_ptz_right
+                icon: mdi:arrow-right
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.living_room_e1_pro
+                    pan_tilt_step: right
 
-      - type: heading
-        heading: Office
-        heading_style: subtitle
-        icon: mdi:desk
-      - type: picture-entity
-        entity: camera.office
-        camera_view: live
-        show_state: false
-        show_name: false
-        tap_action:
-          action: more-info
+      # Office with PTZ controls
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            heading: Office
+            heading_style: subtitle
+            icon: mdi:desk
+          - type: picture-entity
+            entity: camera.office
+            camera_view: live
+            show_state: false
+            show_name: false
+            tap_action:
+              action: more-info
+          - type: grid
+            columns: 3
+            square: true
+            cards:
+              - type: custom:button-card
+                entity: button.office_e1_pro_ptz_up
+                icon: mdi:arrow-up
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.office_e1_pro
+                    pan_tilt_step: up
+              - type: custom:button-card
+                entity: button.office_e1_pro_ptz_home
+                icon: mdi:home
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.office_e1_pro
+                    pan_tilt_step: home
+              - type: custom:button-card
+                entity: button.office_e1_pro_ptz_down
+                icon: mdi:arrow-down
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.office_e1_pro
+                    pan_tilt_step: down
+              - type: custom:button-card
+                entity: button.office_e1_pro_ptz_left
+                icon: mdi:arrow-left
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.office_e1_pro
+                    pan_tilt_step: left
+              - type: custom:button-card
+                entity: button.office_e1_pro_ptz_zoom_in
+                icon: mdi:magnify-plus
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.office_e1_pro
+                    zoom_step: in
+              - type: custom:button-card
+                entity: button.office_e1_pro_ptz_right
+                icon: mdi:arrow-right
+                tap_action:
+                  action: call-service
+                  service: camera.ptz
+                  service_data:
+                    entity_id: camera.office_e1_pro
+                    pan_tilt_step: right
 
   # ---------------------------------------------------------------- recent events
   - type: grid
-    column_span: 2
+    column_span: 1
     cards:
       - type: custom:button-card
         template: section_header
-        name: Recent events
+        name: Recent Events
 
       # Frigate HACS integration ships its own card for browsing events.
       # If the user prefers, this can be swapped for `frigate-card`.
