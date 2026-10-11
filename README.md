@@ -386,12 +386,50 @@ ssh root@192.168.1.2 /opt/homelab-stack/deploy.sh
 
 ### Accessing Services
 
-| Service | URL |
-|---------|-----|
-| Plex | `http://192.168.1.2:32400/web` |
-| Home Assistant | `http://192.168.1.2:8123` |
-| Pi-hole | `http://192.168.1.2:8080/admin` |
-| Frigate | `http://192.168.1.2:5000` (auth required) |
+| Service | Local URL | Remote (Tailscale) |
+|---------|-----------|-------------------|
+| Plex | `http://192.168.1.2:32400/web` | `https://blackbox.${TAILNET}.ts.net:32400` |
+| Home Assistant | `http://192.168.1.2:8123` | `https://blackbox.${TAILNET}.ts.net:8123` |
+| Pi-hole | `http://192.168.1.2:8080/admin` | `https://blackbox.${TAILNET}.ts.net:8080` |
+| Frigate | `http://192.168.1.2:5000` (auth required) | `https://blackbox.${TAILNET}.ts.net:5000` |
+
+### Remote Access via Tailscale Funnel
+
+Tailscale Funnel allows secure remote access to Frigate and Plex over the internet without needing port forwarding. Services are accessible via your Tailscale device name.
+
+#### Prerequisites
+
+- Tailscale deployed on Blackbox
+- All devices on the same Tailnet
+- Funnel enabled in Tailscale admin console (https://login.tailscale.com/admin/acls/funnel)
+
+#### Setup
+
+1. Enable Tailscale Funnel on your tailnet (one-time):
+   ```bash
+   # On any tailnet device, visit:
+   # https://login.tailscale.com/admin/acls/funnel
+   # Toggle funnel on
+   ```
+
+2. Configure Funnel routes for Frigate and Plex on Blackbox:
+   ```bash
+   sudo tailscale serve https+insecure / http://localhost:5000  # Frigate
+   sudo tailscale serve https+insecure / http://localhost:32400 # Plex
+   ```
+   
+   Or use Tailscale's web UI: https://login.tailscale.com/admin/machines
+
+3. Access remotely:
+   - **Frigate:** `https://blackbox.${TAILNET}.ts.net:5000`
+   - **Plex:** `https://blackbox.${TAILNET}.ts.net:32400`
+
+#### DNS Names
+
+Replace `${TAILNET}` with your Tailscale organization name (e.g., `name-12345.ts.net`). Check with:
+```bash
+tailscale status | grep blackbox
+```
 
 ## License
 
