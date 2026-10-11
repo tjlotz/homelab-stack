@@ -7,9 +7,10 @@
 
 set -euo pipefail
 
-REQUIRED_MOUNTS=(
-  "/mnt/Public/Media/Movies"
-  "/mnt/Public/Media/TV Shows"
+# These paths are where the NAS volumes are mounted inside the Plex container
+REQUIRED_VOLUMES=(
+  "/media/Movies"
+  "/media/TV Shows"
 )
 
 TIMEOUT=300  # 5 minutes
@@ -22,19 +23,18 @@ log() {
 log "Waiting for NAS mounts to be ready..."
 
 while [[ $ELAPSED -lt $TIMEOUT ]]; do
-  ALL_MOUNTED=true
+  ALL_READY=true
   
-  for mount in "${REQUIRED_MOUNTS[@]}"; do
-    # Check if directory exists and is readable (not just a mountpoint check)
-    # Inside container, volumes appear as regular directories, not mountpoints
-    if ! [[ -d "$mount" ]] || ! [[ -r "$mount" ]]; then
-      log "  ⏳ Waiting for: $mount"
-      ALL_MOUNTED=false
+  for volume in "${REQUIRED_VOLUMES[@]}"; do
+    # Check if directory exists and is readable
+    if ! [[ -d "$volume" ]] || ! [[ -r "$volume" ]]; then
+      log "  ⏳ Waiting for: $volume"
+      ALL_READY=false
       break
     fi
   done
   
-  if [[ "$ALL_MOUNTED" == true ]]; then
+  if [[ "$ALL_READY" == true ]]; then
     log "✓ All NAS mounts are ready!"
     exit 0
   fi
@@ -44,10 +44,10 @@ while [[ $ELAPSED -lt $TIMEOUT ]]; do
 done
 
 log "✗ Timeout waiting for NAS mounts (${TIMEOUT}s elapsed)"
-log "The following mounts may not be accessible:"
-for mount in "${REQUIRED_MOUNTS[@]}"; do
-  if ! [[ -d "$mount" ]] || ! [[ -r "$mount" ]]; then
-    log "  - $mount"
+log "The following volumes may not be accessible:"
+for volume in "${REQUIRED_VOLUMES[@]}"; do
+  if ! [[ -d "$volume" ]] || ! [[ -r "$volume" ]]; then
+    log "  - $volume"
   fi
 done
 
