@@ -61,14 +61,9 @@ services:
   frigate:
     image: ghcr.io/blakeblackshear/frigate:stable
     container_name: frigate
+    network_mode: host
     privileged: true
     shm_size: "256mb"
-    ports:
-      - "5000:5000"
-      - "8554:8554"
-      - "8555:8555/tcp"
-      - "8555:8555/udp"
-      - "8971:8971"
     environment:
       - FRIGATE_RTSP_USER=${REOLINK_USER}
       - FRIGATE_RTSP_PASSWORD=${REOLINK_PASS}
