@@ -1,20 +1,15 @@
 services:
-  plex:
-    image: lscr.io/linuxserver/plex:latest
-    container_name: plex
-    network_mode: host
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - PLEX_CLAIM=${PLEX_CLAIM}
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    ports:
+      - "8096:8096"
     volumes:
-      - ./plex/config:/config
-      - ./scripts:/scripts:ro
-      - /mnt/Public/Media/Movies:/media/Movies
-      - /mnt/Public/Media/TV Shows:/media/TV Shows
-    # Wait for NAS mounts before starting (prevents unavailability issues)
-    entrypoint: /scripts/wait-for-mounts.sh
+      - ./jellyfin/config:/config
+      - ./jellyfin/cache:/cache
+      - /mnt/Public/Media:/media:ro
+    environment:
+      - TZ=${TZ}
     restart: unless-stopped
 
   homeassistant:
