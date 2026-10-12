@@ -108,10 +108,9 @@ cameras:
             - detect
     onvif:
       host: 192.168.1.11
-      port: 80
+      port: 8000
       user: "{FRIGATE_RTSP_USER}"
       password: "{FRIGATE_RTSP_PASSWORD}"
-      tls_insecure: true
 
   living_room:
     ffmpeg:
@@ -126,10 +125,9 @@ cameras:
             - detect
     onvif:
       host: 192.168.1.12
-      port: 80
+      port: 8000
       user: "{FRIGATE_RTSP_USER}"
       password: "{FRIGATE_RTSP_PASSWORD}"
-      tls_insecure: true
 
   office:
     ffmpeg:
@@ -144,10 +142,9 @@ cameras:
             - detect
     onvif:
       host: 192.168.1.13
-      port: 80
+      port: 8000
       user: "{FRIGATE_RTSP_USER}"
       password: "{FRIGATE_RTSP_PASSWORD}"
-      tls_insecure: true
 
   driveway:
     ffmpeg:
