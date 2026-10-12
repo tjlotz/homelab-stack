@@ -106,23 +106,12 @@ cameras:
           input_args: preset-rtsp-restream
           roles:
             - detect
-    ptz:
+    onvif:
       host: 192.168.1.11
-      port: 554
-      username: "{FRIGATE_RTSP_USER}"
+      port: 80
+      user: "{FRIGATE_RTSP_USER}"
       password: "{FRIGATE_RTSP_PASSWORD}"
-      preset: 0
-      movement:
-        multiplier: 5
-        speed: 50
-      autotrack:
-        enabled: true
-        movement_weights:
-          person: 1.0
-          car: 0.5
-          dog: 1.0
-          cat: 1.0
-        timeout: 10
+      tls_insecure: true
 
   living_room:
     ffmpeg:
@@ -135,23 +124,12 @@ cameras:
           input_args: preset-rtsp-restream
           roles:
             - detect
-    ptz:
+    onvif:
       host: 192.168.1.12
-      port: 554
-      username: "{FRIGATE_RTSP_USER}"
+      port: 80
+      user: "{FRIGATE_RTSP_USER}"
       password: "{FRIGATE_RTSP_PASSWORD}"
-      preset: 0
-      movement:
-        multiplier: 5
-        speed: 50
-      autotrack:
-        enabled: true
-        movement_weights:
-          person: 1.0
-          car: 0.5
-          dog: 1.0
-          cat: 1.0
-        timeout: 10
+      tls_insecure: true
 
   office:
     ffmpeg:
@@ -164,23 +142,12 @@ cameras:
           input_args: preset-rtsp-restream
           roles:
             - detect
-    ptz:
+    onvif:
       host: 192.168.1.13
-      port: 554
-      username: "{FRIGATE_RTSP_USER}"
+      port: 80
+      user: "{FRIGATE_RTSP_USER}"
       password: "{FRIGATE_RTSP_PASSWORD}"
-      preset: 0
-      movement:
-        multiplier: 5
-        speed: 50
-      autotrack:
-        enabled: true
-        movement_weights:
-          person: 1.0
-          car: 0.5
-          dog: 1.0
-          cat: 1.0
-        timeout: 10
+      tls_insecure: true
 
   driveway:
     ffmpeg:
