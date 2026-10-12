@@ -9,51 +9,6 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
-# REST commands for PTZ camera control via Reolink API
-# Sends incremental pan/tilt/zoom commands to E1 Pro cameras
-rest_command:
-  # Garage (192.168.1.11)
-  garage_ptz_up:
-    url: "http://192.168.1.11/api/ptz?command=up&speed=32"
-  garage_ptz_down:
-    url: "http://192.168.1.11/api/ptz?command=down&speed=32"
-  garage_ptz_left:
-    url: "http://192.168.1.11/api/ptz?command=left&speed=32"
-  garage_ptz_right:
-    url: "http://192.168.1.11/api/ptz?command=right&speed=32"
-  garage_ptz_zoom_in:
-    url: "http://192.168.1.11/api/zoom?command=in&speed=32"
-  garage_ptz_home:
-    url: "http://192.168.1.11/api/ptz?command=home"
-
-  # Living Room (192.168.1.12)
-  living_room_ptz_up:
-    url: "http://192.168.1.12/api/ptz?command=up&speed=32"
-  living_room_ptz_down:
-    url: "http://192.168.1.12/api/ptz?command=down&speed=32"
-  living_room_ptz_left:
-    url: "http://192.168.1.12/api/ptz?command=left&speed=32"
-  living_room_ptz_right:
-    url: "http://192.168.1.12/api/ptz?command=right&speed=32"
-  living_room_ptz_zoom_in:
-    url: "http://192.168.1.12/api/zoom?command=in&speed=32"
-  living_room_ptz_home:
-    url: "http://192.168.1.12/api/ptz?command=home"
-
-  # Office (192.168.1.13)
-  office_ptz_up:
-    url: "http://192.168.1.13/api/ptz?command=up&speed=32"
-  office_ptz_down:
-    url: "http://192.168.1.13/api/ptz?command=down&speed=32"
-  office_ptz_left:
-    url: "http://192.168.1.13/api/ptz?command=left&speed=32"
-  office_ptz_right:
-    url: "http://192.168.1.13/api/ptz?command=right&speed=32"
-  office_ptz_zoom_in:
-    url: "http://192.168.1.13/api/zoom?command=in&speed=32"
-  office_ptz_home:
-    url: "http://192.168.1.13/api/ptz?command=home"
-
 # Enable built-in go2rtc for RTSP restreaming
 go2rtc:
 

@@ -120,155 +120,224 @@ sections:
             tap_action:
               action: more-info
 
-      # Garage with PTZ controls
-      - type: grid
-        column_span: 1
-        cards:
-          - type: heading
-            heading: Garage
-            heading_style: subtitle
-            icon: mdi:garage
-          - type: picture-entity
-            entity: camera.garage
-            camera_view: live
-            show_state: false
-            show_name: false
-            tap_action:
-              action: more-info
-          - type: grid
-            columns: 3
-            square: true
-            cards:
-              - type: button
-                name: ↑
-                tap_action:
-                  action: call-service
-                  service: rest_command.garage_ptz_up
-              - type: button
-                name: Home
-                tap_action:
-                  action: call-service
-                  service: rest_command.garage_ptz_home
-              - type: button
-                name: ↓
-                tap_action:
-                  action: call-service
-                  service: rest_command.garage_ptz_down
-              - type: button
-                name: ←
-                tap_action:
-                  action: call-service
-                  service: rest_command.garage_ptz_left
-              - type: button
-                name: 🔍+
-                tap_action:
-                  action: call-service
-                  service: rest_command.garage_ptz_zoom_in
-              - type: button
-                name: →
-                tap_action:
-                  action: call-service
-                  service: rest_command.garage_ptz_right
+       # Garage with PTZ controls (via Frigate)
+       - type: grid
+         column_span: 1
+         cards:
+           - type: heading
+             heading: Garage
+             heading_style: subtitle
+             icon: mdi:garage
+           - type: picture-entity
+             entity: camera.garage
+             camera_view: live
+             show_state: false
+             show_name: false
+             tap_action:
+               action: more-info
+           - type: grid
+             columns: 3
+             square: true
+             cards:
+               - type: button
+                 name: ↑
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.garage
+                     movement: up
+                     distance: 0.3
+               - type: button
+                 name: Home
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_preset
+                   service_data:
+                     entity_id: camera.garage
+                     preset_name: home
+               - type: button
+                 name: ↓
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.garage
+                     movement: down
+                     distance: 0.3
+               - type: button
+                 name: ←
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.garage
+                     movement: left
+                     distance: 0.3
+               - type: button
+                 name: 🔍+
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.garage
+                     movement: zoom_in
+                     distance: 0.3
+               - type: button
+                 name: →
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.garage
+                     movement: right
+                     distance: 0.3
 
-      # Living Room with PTZ controls
-      - type: grid
-        column_span: 1
-        cards:
-          - type: heading
-            heading: Living Room
-            heading_style: subtitle
-            icon: mdi:sofa
-          - type: picture-entity
-            entity: camera.living_room
-            camera_view: live
-            show_state: false
-            show_name: false
-            tap_action:
-              action: more-info
-          - type: grid
-            columns: 3
-            square: true
-            cards:
-              - type: button
-                name: ↑
-                tap_action:
-                  action: call-service
-                  service: rest_command.living_room_ptz_up
-              - type: button
-                name: Home
-                tap_action:
-                  action: call-service
-                  service: rest_command.living_room_ptz_home
-              - type: button
-                name: ↓
-                tap_action:
-                  action: call-service
-                  service: rest_command.living_room_ptz_down
-              - type: button
-                name: ←
-                tap_action:
-                  action: call-service
-                  service: rest_command.living_room_ptz_left
-              - type: button
-                name: 🔍+
-                tap_action:
-                  action: call-service
-                  service: rest_command.living_room_ptz_zoom_in
-              - type: button
-                name: →
-                tap_action:
-                  action: call-service
-                  service: rest_command.living_room_ptz_right
+       # Living Room with PTZ controls (via Frigate)
+       - type: grid
+         column_span: 1
+         cards:
+           - type: heading
+             heading: Living Room
+             heading_style: subtitle
+             icon: mdi:sofa
+           - type: picture-entity
+             entity: camera.living_room
+             camera_view: live
+             show_state: false
+             show_name: false
+             tap_action:
+               action: more-info
+           - type: grid
+             columns: 3
+             square: true
+             cards:
+               - type: button
+                 name: ↑
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.living_room
+                     movement: up
+                     distance: 0.3
+               - type: button
+                 name: Home
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_preset
+                   service_data:
+                     entity_id: camera.living_room
+                     preset_name: home
+               - type: button
+                 name: ↓
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.living_room
+                     movement: down
+                     distance: 0.3
+               - type: button
+                 name: ←
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.living_room
+                     movement: left
+                     distance: 0.3
+               - type: button
+                 name: 🔍+
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.living_room
+                     movement: zoom_in
+                     distance: 0.3
+               - type: button
+                 name: →
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.living_room
+                     movement: right
+                     distance: 0.3
 
-      # Office with PTZ controls
-      - type: grid
-        column_span: 1
-        cards:
-          - type: heading
-            heading: Office
-            heading_style: subtitle
-            icon: mdi:desk
-          - type: picture-entity
-            entity: camera.office
-            camera_view: live
-            show_state: false
-            show_name: false
-            tap_action:
-              action: more-info
-          - type: grid
-            columns: 3
-            square: true
-            cards:
-              - type: button
-                name: ↑
-                tap_action:
-                  action: call-service
-                  service: rest_command.office_ptz_up
-              - type: button
-                name: Home
-                tap_action:
-                  action: call-service
-                  service: rest_command.office_ptz_home
-              - type: button
-                name: ↓
-                tap_action:
-                  action: call-service
-                  service: rest_command.office_ptz_down
-              - type: button
-                name: ←
-                tap_action:
-                  action: call-service
-                  service: rest_command.office_ptz_left
-              - type: button
-                name: 🔍+
-                tap_action:
-                  action: call-service
-                  service: rest_command.office_ptz_zoom_in
-              - type: button
-                name: →
-                tap_action:
-                  action: call-service
-                  service: rest_command.office_ptz_right
+       # Office with PTZ controls (via Frigate)
+       - type: grid
+         column_span: 1
+         cards:
+           - type: heading
+             heading: Office
+             heading_style: subtitle
+             icon: mdi:desk
+           - type: picture-entity
+             entity: camera.office
+             camera_view: live
+             show_state: false
+             show_name: false
+             tap_action:
+               action: more-info
+           - type: grid
+             columns: 3
+             square: true
+             cards:
+               - type: button
+                 name: ↑
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.office
+                     movement: up
+                     distance: 0.3
+               - type: button
+                 name: Home
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_preset
+                   service_data:
+                     entity_id: camera.office
+                     preset_name: home
+               - type: button
+                 name: ↓
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.office
+                     movement: down
+                     distance: 0.3
+               - type: button
+                 name: ←
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.office
+                     movement: left
+                     distance: 0.3
+               - type: button
+                 name: 🔍+
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.office
+                     movement: zoom_in
+                     distance: 0.3
+               - type: button
+                 name: →
+                 tap_action:
+                   action: call-service
+                   service: frigate.ptz_move
+                   service_data:
+                     entity_id: camera.office
+                     movement: right
+                     distance: 0.3
 
   # ---------------------------------------------------------------- recent events
   - type: grid
