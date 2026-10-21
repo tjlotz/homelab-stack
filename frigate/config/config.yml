@@ -141,33 +141,33 @@ cameras:
           roles:
             - record
         - path: rtsp://127.0.0.1:8554/office_sub
-          input_args: preset-rtsp-restream
-          roles:
-     - detect
-    onvif:
-      host: 192.168.1.13
-      port: 8000
-      user: "{FRIGATE_RTSP_USER}"
-       password: "{FRIGATE_RTSP_PASSWORD}"
-
-   driveway:
-     ffmpeg:
-       inputs:
-         - path: rtsp://127.0.0.1:8554/driveway
-           input_args: preset-rtsp-restream
-           roles:
-             - record
-         - path: rtsp://127.0.0.1:8554/driveway_sub
            input_args: preset-rtsp-restream
            roles:
              - detect
-     onvif:
-       host: 192.168.1.14
-       port: 8000
+    onvif:
+      host: 192.168.1.13
+      port: 8000
        user: "{FRIGATE_RTSP_USER}"
        password: "{FRIGATE_RTSP_PASSWORD}"
 
-   entryway:
+  driveway:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/driveway
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/driveway_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    onvif:
+      host: 192.168.1.14
+      port: 8000
+      user: "{FRIGATE_RTSP_USER}"
+      password: "{FRIGATE_RTSP_PASSWORD}"
+
+  entryway:
     ffmpeg:
       inputs:
         - path: rtsp://127.0.0.1:8554/entryway
