@@ -141,9 +141,9 @@ cameras:
           roles:
             - record
         - path: rtsp://127.0.0.1:8554/office_sub
-           input_args: preset-rtsp-restream
-           roles:
-             - detect
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
     onvif:
       host: 192.168.1.13
       port: 8000
