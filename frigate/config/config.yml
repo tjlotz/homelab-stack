@@ -78,9 +78,13 @@ go2rtc:
     office_sub:
       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.13:554/h264Preview_01_sub
     driveway:
-      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.14:554/h264Preview_01_main
-    driveway_sub:
-      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.14:554/h264Preview_01_sub
+       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.14:554/h264Preview_01_main
+     driveway_sub:
+       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.1.14:554/h264Preview_01_sub
+     entryway:
+       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@198.162.1.15:554/h264Preview_01_main
+     entryway_sub:
+       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@198.162.1.15:554/h264Preview_01_sub
 
 cameras:
   doorbell:
@@ -146,14 +150,31 @@ cameras:
       user: "{FRIGATE_RTSP_USER}"
       password: "{FRIGATE_RTSP_PASSWORD}"
 
-  driveway:
-    ffmpeg:
-      inputs:
-        - path: rtsp://127.0.0.1:8554/driveway
-          input_args: preset-rtsp-restream
-          roles:
-            - record
-        - path: rtsp://127.0.0.1:8554/driveway_sub
-          input_args: preset-rtsp-restream
-          roles:
-            - detect
+   driveway:
+     ffmpeg:
+       inputs:
+         - path: rtsp://127.0.0.1:8554/driveway
+           input_args: preset-rtsp-restream
+           roles:
+             - record
+         - path: rtsp://127.0.0.1:8554/driveway_sub
+           input_args: preset-rtsp-restream
+           roles:
+             - detect
+
+   entryway:
+     ffmpeg:
+       inputs:
+         - path: rtsp://127.0.0.1:8554/entryway
+           input_args: preset-rtsp-restream
+           roles:
+             - record
+         - path: rtsp://127.0.0.1:8554/entryway_sub
+           input_args: preset-rtsp-restream
+           roles:
+             - detect
+     onvif:
+       host: 198.162.1.15
+       port: 8000
+       user: "{FRIGATE_RTSP_USER}"
+       password: "{FRIGATE_RTSP_PASSWORD}"
